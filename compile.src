@@ -1,0 +1,14 @@
+setenv SCRAM_ARCH slc5_amd64_gcc462
+cmsrel CMSSW_5_2_3
+cd CMSSW_5_2_3/src
+eval `scramv1 runtime -csh`
+cvs co -d VecbosApp UserCode/amott/VecbosApp
+cvs co -d VecbosApp/CommonTools UserCode/emanuele/CommonTools
+cvs co -d VecbosApp/EgammaAnalysisTools UserCode/emanuele/EgammaAnalysisTools
+cvs co -d VecbosApp/VecbosSamples UserCode/CITCommon/VecbosSamples
+cd VecbosApp
+source setup_fastjet_x64.sh
+cd EgammaAnalysisTools
+make
+cd ..
+make
