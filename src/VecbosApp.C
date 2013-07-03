@@ -25,7 +25,7 @@
 #include <include/Application.hh>
 #include <CommonTools/include/TriggerMask.hh>
 #include <include/Vecbos.hh>
-#include <include/ArgParser.hh>
+
 
 // include your VECBOS analysis
 #if Application == 1
@@ -135,33 +135,10 @@ int main(int argc, char* argv[]) {
 
   /// Gets the list of input files and chains
   /// them into a single TChain
-  ArgParser parser(argc,argv);
-
-  parser.addArgument("InputFile",ArgParser::required,"file containing a list of root files to be processed");
-  parser.addArgument("OutputFile",ArgParser::required,"file to which to write the output");
-
-  parser.addLongOption("isData",ArgParser::noArg,"specify that we are running on data (apply trigger, use JSON, etc.) [default=false]");
-  parser.addLongOption("json",ArgParser::reqArg,"path to the JSON file (should always be supplied when running on data)");
-  parser.addLongOption("start",ArgParser::reqArg,"specify the event on which to start [default=0]");
-  parser.addLongOption("stop",ArgParser::reqArg,"specify the event on which to stop [default=all events]");
-  parser.addLongOption("weight",ArgParser::reqArg,"specify the weight of the MC [default=1]");
-  parser.addLongOption("xsec",ArgParser::reqArg,"set the X-sec for this sample");
-  parser.addLongOption("lumi",ArgParser::reqArg,"set the lumi for this sample");
-  parser.addLongOption("signal",ArgParser::reqArg,"0=W(prompt),1=Z(prompt),2=W(other),3=Z(other), 4= no mctruth");
-
-  string ret;
-  if(parser.process(ret) !=0){
-    cout << "Invalid Options:  " << ret <<endl << endl;
-    parser.printOptions(argv[0]);
-    return 0;
-  }
-
-  const int nChar=400;
-  
-  char inputFileName[nChar];
-  char outFileName[nChar];
-  char skimFileName[nChar];
-  char json[nChar]="none";
+  char inputFileName[150];
+  char outFileName[150];
+  char skimFileName[150];
+  char json[150]="none";
 
   if ( argc < 3 ){
     cout << "Error at Input: please specify an input file including the list of input ROOT files" << endl; 
@@ -176,13 +153,15 @@ int main(int argc, char* argv[]) {
     return 1;
   }
 
-  strncpy(outFileName,parser.getArgument("OutputFile").c_str(),nChar);
-  strncpy(skimFileName,parser.getArgument("OutputFile").c_str(),nChar);
+  // rad running options
+  strcpy(inputFileName,argv[1]);
+  strcpy(outFileName,argv[2]);
+  strcpy(skimFileName,argv[2]);
 
   TChain *theChain = new TChain("ntp1");
   char Buffer[500];
   char MyRootFile[2000];  
-  ifstream *inputFile = new ifstream( parser.getArgument("InputFile").c_str() );
+  ifstream *inputFile = new ifstream(inputFileName);
   // get the tree with the conditions from the first file
   //  TTree *treeCond = new TTree();
   //  int nfiles=1;
@@ -202,13 +181,24 @@ int main(int argc, char* argv[]) {
    }
    else
 	  theChain->Add("rfio:"+TString(MyRootFile));
+
+        // theChain->Add("root://castorcms/"+TString(MyRootFile));
+	//        theChain->Add(TString(MyRootFile));
 	std::cout << "chaining " << MyRootFile << std::endl;
+	//	if ( nfiles==1 ) {
+	//	  TFile *firstfile = TFile::Open("root://castorcms/"+TString(MyRootFile));
+	//	  treeCond = (TTree*)firstfile->Get("Conditions");
+	//	}
+	//        nfiles++;
       }
-  } 
+  }
+ 
+
+  //  theChain->MakeClass("thisiswhyitcrashed");
+
   inputFile->close();
   delete inputFile;
   // get additional input options
-
   int signal = 0;
   int start = 0;
   int stop  = theChain->GetEntries();
@@ -216,15 +206,17 @@ int main(int argc, char* argv[]) {
   float lumi = -999.;
   float xsec = -999.;
   float weight = 1.;
-  
-  if(parser.longFlagPres("start")) start = atoi( parser.getLongFlag("start").c_str() );
-  if(parser.longFlagPres("stop")) stop = atoi( parser.getLongFlag("stop").c_str() );
-  if(parser.longFlagPres("signal")) signal = atoi( parser.getLongFlag("signal").c_str() );
-  if(parser.longFlagPres("weight")) weight = atof( parser.getLongFlag("weight").c_str() );
-  if(parser.longFlagPres("xsec")) xsec = atof( parser.getLongFlag("xsec").c_str() );
-  if(parser.longFlagPres("lumi")) lumi = atof( parser.getLongFlag("lumi").c_str() );
-  if(parser.longFlagPres("isData")) isData=true;
-  if(parser.longFlagPres("json")) strncpy(json,parser.getLongFlag("json").c_str(),nChar);
+  for (int i=1;i<argc;i++){
+    if (strncmp(argv[i],"-start",6)==0) sscanf(argv[i],"-start=%i",&start);
+    if (strncmp(argv[i],"-stop",5)==0)  sscanf(argv[i],"-stop=%i",&stop);
+    if (strncmp(argv[i],"-signal",7)==0)  sscanf(argv[i],"-signal=%i",&signal);
+    if (strncmp(argv[i],"-weight",7)==0)  sscanf(argv[i],"-weight=%f",&weight);
+    if (strncmp(argv[i],"--isData",8)==0)  isData = true;
+    if (strncmp(argv[i],"-lumi",5)==0)  sscanf(argv[i],"-lumi=%f",&lumi);
+    if (strncmp(argv[i],"-xsec",5)==0)  sscanf(argv[i],"-xsec=%f",&xsec);
+    if (strncmp(argv[i],"-json",5)==0)  sscanf(argv[i],"-json=%s",&json);
+  }
+
   
 
 #if Application == 1
