@@ -105,7 +105,8 @@ VecbosApp:  $(SRCDIR)VecbosApp.C \
 	$(OUTLIB)VBTFLeptEff.o \
 	$(OUTLIB)LQ3Analysis.o \
 	$(OUTLIB)SUSYMultiTop.o \
-	$(OUTLIB)SUSYNLO.o 	
+	$(OUTLIB)SUSYNLO.o 	\
+	$(OUTLIB)ArgParser.o
 	$(CXX) $(CXXFLAGS) -o VecbosApp $(OUTLIB)/*.o $(OUTLIBCOMMON)/*o $(OUTLIBEGAMMA)/*o $(GLIBS) $ $<
 # fix for 2012 data format
 #	$(OUTLIB)RazorDiPhoton.o \
@@ -156,7 +157,8 @@ lib: 	$(OUTLIBCOMMON)Conditions.o \
 	$(OUTLIB)VBTFLeptEff.o \
 	$(OUTLIB)SUSYNLO.o 	\
 	$(OUTLIB)LQ3Analysis.o \
-	$(OUTLIB)SUSYMultiTop.o
+	$(OUTLIB)SUSYMultiTop.o \
+	$(OUTLIB)ArgParser.o
 #	$(OUTLIB)VecbosMuMuSelection.o \
 #	$(OUTLIB)LFJetControlSample.o \
 #	$(OUTLIB)CandleCalib_ee.o 
@@ -412,6 +414,9 @@ $(OUTLIB)GenWjets.o: $(SRCDIR)GenWjets.C $(OUTLIB)GenVecbos.o $(OUTLIB)Vecbos.o
 
 $(OUTLIB)GenZjets.o: $(SRCDIR)GenZjets.C $(OUTLIB)GenVecbos.o $(OUTLIB)Vecbos.o
 	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)GenZjets.o $<
+
+$(OUTLIB)ArgParser.o: $(SRCDIR)ArgParser.cc
+	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)ArgParser.o $<
 
 VecbosApp.clean:
 	rm -f VecbosApp
