@@ -1,0 +1,14 @@
+setenv SCRAM_ARCH slc5_amd64_gcc462
+cmsrel CMSSW_5_3_3_patch3
+cd CMSSW_5_3_3_patch3/src
+eval `scramv1 runtime -csh`
+cd -
+git clone https://github.com/VecbosApp/CommonTools.git
+git clone https://github.com/VecbosApp/EgammaAnalysisTools.git
+git clone https://github.com/VecbosApp/VecbosSamples.git
+rm -rf EgammaAnalysisTools/elebdtweights
+sh setup_fastjet_x64.sh
+cd EgammaAnalysisTools
+make
+cd ..
+make
