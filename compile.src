@@ -3,9 +3,9 @@ cmsrel CMSSW_5_3_3_patch3
 cd CMSSW_5_3_3_patch3/src
 eval `scramv1 runtime -csh`
 cd -
-cvs co -d CommonTools UserCode/emanuele/CommonTools
-cvs co -d EgammaAnalysisTools UserCode/emanuele/EgammaAnalysisTools
-cvs co -d VecbosSamples UserCode/CITCommon/VecbosSamples
+git clone git@github.com:VecbosApp/CommonTools.git
+git clone git@github.com:VecbosApp/EgammaAnalysisTools.git
+git clone git@github.com:VecbosApp/VecbosSamples.git
 rm -rf EgammaAnalysisTools/elebdtweights
 sh setup_fastjet_x64.sh
 cd EgammaAnalysisTools
