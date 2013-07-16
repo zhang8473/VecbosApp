@@ -76,10 +76,7 @@ GenVecbosApp: $(SRCDIR)GenVecbosApp.C \
 VecbosApp:  $(SRCDIR)VecbosApp.C \
 	$(OUTLIB)Vecbos.o \
 	$(OUTLIB)DiJet.o \
-	$(OUTLIB)Razor.o \
-	$(OUTLIB)RazorMultiB.o \
-	$(OUTLIB)RazorDiMuB.o \
-	$(OUTLIB)RazorDMAnalysis.o \
+        $(OUTLIB)RazorHiggsBB.o \
 	$(OUTLIB)MonoJet.o \
 	$(OUTLIB)CandleCalib.o \
 	$(OUTLIBCOMMON)Conditions.o \
@@ -100,11 +97,7 @@ VecbosApp:  $(SRCDIR)VecbosApp.C \
 	$(OUTLIB)RedVecbosVertexTree.o \
 	$(OUTLIB)RedIsolationVtxOptimTree.o \
 	$(OUTLIB)RedEleIDOptimTree.o \
-	$(OUTLIB)LQ3Helper.o \
-	$(OUTLIB)VecbosExample.o \
 	$(OUTLIB)VBTFLeptEff.o \
-	$(OUTLIB)LQ3Analysis.o \
-	$(OUTLIB)SUSYMultiTop.o \
 	$(OUTLIB)SUSYNLO.o 	
 	$(CXX) $(CXXFLAGS) -o VecbosApp $(OUTLIB)/*.o $(OUTLIBCOMMON)/*o $(OUTLIBEGAMMA)/*o $(GLIBS) $ $<
 # fix for 2012 data format
@@ -144,19 +137,12 @@ lib: 	$(OUTLIBCOMMON)Conditions.o \
 	$(OUTLIB)VecbosTTCounter.o \
 	$(OUTLIB)TestAnalysis.o \
 	$(OUTLIB)DiJet.o \
-	$(OUTLIB)Razor.o \
-	$(OUTLIB)RazorLeptons.o \
+	$(OUTLIB)RazorHiggsBB.o \
 	$(OUTLIB)RazorMultiB.o \
-	$(OUTLIB)RazorDiMuB.o \
-	$(OUTLIB)RazorDMAnalysis.o \
 	$(OUTLIB)MonoJet.o \
 	$(OUTLIB)CandleCalib.o \
-	$(OUTLIB)LQ3Helper.o \
-	$(OUTLIB)VecbosExample.o \
 	$(OUTLIB)VBTFLeptEff.o \
-	$(OUTLIB)SUSYNLO.o 	\
-	$(OUTLIB)LQ3Analysis.o \
-	$(OUTLIB)SUSYMultiTop.o
+	$(OUTLIB)SUSYNLO.o
 #	$(OUTLIB)VecbosMuMuSelection.o \
 #	$(OUTLIB)LFJetControlSample.o \
 #	$(OUTLIB)CandleCalib_ee.o 
@@ -190,9 +176,6 @@ $(OUTLIB)VtxStudy.o: $(SRCDIR)VtxStudy.cc $(OUTLIB)Vecbos.o
 $(OUTLIB)FindDuplicatedEvents.o: $(SRCDIR)FindDuplicatedEvents.cc 
 	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)FindDuplicatedEvents.o $<
 
-$(OUTLIB)SUSYAnalysis.o: $(SRCDIR)SUSYAnalysis.cc $(OUTLIB)Vecbos.o
-	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)SUSYAnalysis.o $<
-
 $(OUTLIB)CandleCalib.o: $(SRCDIR)CandleCalib.cc $(OUTLIB)Vecbos.o
 	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)CandleCalib.o $<
 
@@ -208,35 +191,8 @@ $(OUTLIB)DiJet.o: $(SRCDIR)DiJet.cc $(OUTLIB)Vecbos.o
 $(OUTLIB)RazorHiggsBB.o: $(SRCDIR)RazorHiggsBB.cc $(OUTLIB)Vecbos.o $(OUTLIB)SUSYNLO.o
 	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)RazorHiggsBB.o $<
 
-$(OUTLIB)RazorBoostedTop.o: $(SRCDIR)RazorBoostedTop.cc $(OUTLIB)Vecbos.o $(OUTLIB)SUSYNLO.o
-	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)RazorBoostedTop.o $<
-
-$(OUTLIB)RazorDiPhoton.o: $(SRCDIR)RazorDiPhoton.cc $(OUTLIB)Vecbos.o $(OUTLIB)SUSYNLO.o
-	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)RazorDiPhoton.o $<
-
-$(OUTLIB)Razor.o: $(SRCDIR)Razor.cc $(OUTLIB)Vecbos.o $(OUTLIB)SUSYNLO.o
-	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)Razor.o $<
-
-$(OUTLIB)RazorLeptons.o: $(SRCDIR)RazorLeptons.cc $(OUTLIB)Vecbos.o $(OUTLIB)SUSYNLO.o
-	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)RazorLeptons.o $<
-
-$(OUTLIB)SUSYTau.o: $(SRCDIR)SUSYTau.cc $(OUTLIB)Vecbos.o
-	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)SUSYTau.o $<
-
-$(OUTLIB)SUSYMultiTop.o: $(SRCDIR)SUSYMultiTop.cc $(OUTLIB)Vecbos.o
-	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)SUSYMultiTop.o $<
-
-$(OUTLIB)SUSYMultiB.o: $(SRCDIR)SUSYMultiB.cc $(OUTLIB)Vecbos.o
-	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)SUSYMultiB.o $<
-
 $(OUTLIB)RazorMultiB.o: $(SRCDIR)RazorMultiB.cc $(OUTLIB)Vecbos.o
 	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)RazorMultiB.o $<
-
-$(OUTLIB)RazorDiMuB.o: $(SRCDIR)RazorDiMuB.cc $(OUTLIB)Vecbos.o
-	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)RazorDiMuB.o $<
-
-$(OUTLIB)RazorDMAnalysis.o: $(SRCDIR)RazorDMAnalysis_pfJets.cc $(OUTLIB)Vecbos.o
-	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)RazorDMAnalysis.o $<
 
 $(OUTLIB)MonoJet.o: $(SRCDIR)MonoJet.cc $(OUTLIB)Vecbos.o
 	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)MonoJet.o $<
@@ -308,15 +264,6 @@ $(OUTLIB)VecbosTTCounter.o: $(SRCDIR)VecbosTTCounter.cc $(OUTLIB)VecbosBase.o
 $(OUTLIB)CreateWJetDataset.o: $(SRCDIR)CreateWJetDataset.cc $(OUTLIB)VecbosBase.o
 	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)CreateWJetDataset.o $<
 
-$(OUTLIB)LQ3Helper.o: $(SRCDIR)LQ3Helper.cc
-	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)LQ3Helper.o $<
-
-$(OUTLIB)VecbosExample.o: $(SRCDIR)VecbosExample.cc
-	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)VecbosExample.o $<
-
-$(OUTLIB)LQ3Analysis.o: $(SRCDIR)LQ3Analysis.cc $(OUTLIB)Vecbos.o $(OUTLIB)LQ3Helper.o
-	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)LQ3Analysis.o $<
-
 $(OUTLIB)SUSYNLO.o: $(SRCDIR)SUSYNLO.cc 
 	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)SUSYNLO.o $<
 
@@ -333,7 +280,7 @@ $(OUTLIB)Vecbos.o: $(SRCDIR)Vecbos.cc $(OUTLIB)VecbosBase.o $(OUTLIB)Jet.o  \
 	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)Vecbos.o $<
 
 # base class with ntuple structure
-$(OUTLIB)VecbosBase.o: $(SRCDIR)VecbosBase.cc 
+$(OUTLIB)VecbosBase.o: $(SRCDIR)VecbosBase.cc
 	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)VecbosBase.o $<
 
 # auxiliary functions (MET, JEt, CaloTower) for offline reclustering
