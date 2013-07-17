@@ -399,6 +399,7 @@ public :
    Float_t         esL2EnergyPhoPFSC[10];   //[nPhoPFSC]
    Int_t           esL1StripsPhoPFSC[10];   //[nPhoPFSC]
    Int_t           esL2StripsPhoPFSC[10];   //[nPhoPFSC]
+  /*
    Int_t           nBC;
    Int_t           nCrystalsBC[600];   //[nBC]
    Float_t         energyBC[600];   //[nBC]
@@ -436,6 +437,7 @@ public :
    Int_t           sevClosProblBC[600];   //[nBC]
    Float_t         fracClosProblBC[600];   //[nBC]
    Int_t           indexSCBC[600];   //[nBC]
+  */
    Int_t           nPFBC;
    Int_t           nCrystalsPFBC[50];   //[nPFBC]
    Float_t         energyPFBC[50];   //[nPFBC]
@@ -868,7 +870,7 @@ public :
    Float_t         vertexXGenMet[1];   //[nGenMet]
    Float_t         vertexYGenMet[1];   //[nGenMet]
    Float_t         vertexZGenMet[1];   //[nGenMet]
-   Int_t           nAK5Jet;
+  /*   Int_t           nAK5Jet;
    Int_t           chargeAK5Jet[250];   //[nAK5Jet]
    Float_t         energyAK5Jet[250];   //[nAK5Jet]
    Float_t         thetaAK5Jet[250];   //[nAK5Jet]
@@ -902,7 +904,7 @@ public :
    Float_t         uncorrpxAK5PFPUcorrJet[250];   //[nAK5Jet]
    Float_t         uncorrpyAK5PFPUcorrJet[250];   //[nAK5Jet]
    Float_t         uncorrpzAK5PFPUcorrJet[250];   //[nAK5Jet]
-
+  */
    Float_t         uncorrpxAK5PFNoPUJet[250];   //[nAK5Jet]
    Float_t         uncorrpyAK5PFNoPUJet[250];   //[nAK5Jet]
    Float_t         uncorrpzAK5PFNoPUJet[250];   //[nAK5Jet]
@@ -934,6 +936,7 @@ public :
    Int_t           HFHadronMultiplicityAK5PFNoPUJet[200];   //[nAK5PFNoPUJet]
    Int_t           HFEMMultiplicityAK5PFNoPUJet[200];   //[nAK5PFNoPUJet]
    Float_t         areaAK5PFNoPUJet[200];   //[nAK5PFNoPUJet]
+   Float_t         pullAK5PFNoPUJet[200];   //[nAK5PFNoPUJet]
    Float_t         weightedDz1AK5PFNoPUJet[200];   //[nAK5PFNoPUJet]
    Float_t         weightedDz2AK5PFNoPUJet[200];   //[nAK5PFNoPUJet]
    Float_t         betastarAK5PFNoPUJet[200];   //[nAK5PFNoPUJet]
@@ -942,7 +945,7 @@ public :
    Float_t         nChargedIdMvaAK5PFNoPUJet[200];   //[nAK5PFNoPUJet]
    Float_t         nNeutralsIdMvaAK5PFNoPUJet[200];   //[nAK5PFNoPUJet]
    Float_t         dZIdMvaAK5PFNoPUJet[200];   //[nAK5PFNoPUJet]
-   Float_t         nParticlesIdMvaAK5PFNoPUJet[200];   //[nAK5PFNoPUJet]
+   //Float_t         nParticlesIdMvaAK5PFNoPUJet[200];   //[nAK5PFNoPUJet]
    Float_t         dR2MeanIdMvaAK5PFNoPUJet[200];   //[nAK5PFNoPUJet]
    Float_t         dRMeanIdMvaAK5PFNoPUJet[200];   //[nAK5PFNoPUJet]
    Float_t         frac01IdMvaAK5PFNoPUJet[200];   //[nAK5PFNoPUJet]
@@ -995,12 +998,11 @@ public :
    Float_t         weightedDz2AK5PFPUcorrJet[200];   //[nAK5PFPUcorrJet]
    Float_t         betastarAK5PFPUcorrJet[200];   //[nAK5PFPUcorrJet]
    Float_t         rmsCandsHandAK5PFPUcorrJet[200];   //[nAK5PFPUcorrJet]
-   Float_t         jetIdMvaAK5PFPUcorrJet[200];   //[nAK5PFPUcorrJet]
-   Float_t         jetIdMvaPhilV1AK5PFPUcorrJet[200];   //[nAK5PFPUcorrJet]
+    //Float_t         jetIdMvaAK5PFPUcorrJet[200];   //[nAK5PFPUcorrJet]
    Float_t         nChargedIdMvaAK5PFPUcorrJet[200];   //[nAK5PFPUcorrJet]
    Float_t         nNeutralsIdMvaAK5PFPUcorrJet[200];   //[nAK5PFPUcorrJet]
    Float_t         dZIdMvaAK5PFPUcorrJet[200];   //[nAK5PFPUcorrJet]
-   Float_t         nParticlesIdMvaAK5PFPUcorrJet[200];   //[nAK5PFPUcorrJet]
+   //Float_t         nParticlesIdMvaAK5PFPUcorrJet[200];   //[nAK5PFPUcorrJet]
    Float_t         dR2MeanIdMvaAK5PFPUcorrJet[200];   //[nAK5PFPUcorrJet]
    Float_t         dRMeanIdMvaAK5PFPUcorrJet[200];   //[nAK5PFPUcorrJet]
    Float_t         frac01IdMvaAK5PFPUcorrJet[200];   //[nAK5PFPUcorrJet]
@@ -1058,7 +1060,7 @@ public :
    Double_t        sumETriangleHBHENoise;
    Int_t           nHFPMT;
    Double_t        sumEHFPMT;
-   Int_t           METFlags;
+  //Int_t           METFlags;
 
    // List of branches
    TBranch        *b_nl1Technical;   //!
@@ -1435,6 +1437,7 @@ public :
    TBranch        *b_esL2EnergyPhoPFSC;   //!
    TBranch        *b_esL1StripsPhoPFSC;   //!
    TBranch        *b_esL2StripsPhoPFSC;   //!
+  /*
    TBranch        *b_nBC;   //!
    TBranch        *b_nCrystalsBC;   //!
    TBranch        *b_energyBC;   //!
@@ -1472,6 +1475,7 @@ public :
    TBranch        *b_sevClosProblBC;   //!
    TBranch        *b_fracClosProblBC;   //!
    TBranch        *b_indexSCBC;   //!
+  */
    TBranch        *b_nPFBC;   //!
    TBranch        *b_nCrystalsPFBC;   //!
    TBranch        *b_energyPFBC;   //!
@@ -1904,7 +1908,7 @@ public :
    TBranch        *b_vertexXGenMet;   //!
    TBranch        *b_vertexYGenMet;   //!
    TBranch        *b_vertexZGenMet;   //!
-   TBranch        *b_nAK5Jet;   //!
+  /*   TBranch        *b_nAK5Jet;   //!
    TBranch        *b_chargeAK5Jet;   //!
    TBranch        *b_energyAK5Jet;   //!
    TBranch        *b_thetaAK5Jet;   //!
@@ -1938,7 +1942,7 @@ public :
    TBranch        *b_uncorrpxAK5PFPUcorrJet;   //!
    TBranch        *b_uncorrpyAK5PFPUcorrJet;   //!
    TBranch        *b_uncorrpzAK5PFPUcorrJet;   //!
-
+  */
    TBranch        *b_uncorrpxAK5PFNoPUJet;   //!
    TBranch        *b_uncorrpyAK5PFNoPUJet;   //!
    TBranch        *b_uncorrpzAK5PFNoPUJet;   //!
@@ -1970,6 +1974,7 @@ public :
    TBranch        *b_HFHadronMultiplicityAK5PFNoPUJet;   //!
    TBranch        *b_HFEMMultiplicityAK5PFNoPUJet;   //!
    TBranch        *b_areaAK5PFNoPUJet;   //!
+   TBranch        *b_pullAK5PFNoPUJet;   //!
    TBranch        *b_weightedDz1AK5PFNoPUJet;   //!
    TBranch        *b_weightedDz2AK5PFNoPUJet;   //!
    TBranch        *b_betastarAK5PFNoPUJet;   //!
@@ -1978,7 +1983,7 @@ public :
    TBranch        *b_nChargedIdMvaAK5PFNoPUJet;   //!
    TBranch        *b_nNeutralsIdMvaAK5PFNoPUJet;   //!
    TBranch        *b_dZIdMvaAK5PFNoPUJet;   //!
-   TBranch        *b_nParticlesIdMvaAK5PFNoPUJet;   //!
+  //TBranch        *b_nParticlesIdMvaAK5PFNoPUJet;   //!
    TBranch        *b_dR2MeanIdMvaAK5PFNoPUJet;   //!
    TBranch        *b_dRMeanIdMvaAK5PFNoPUJet;   //!
    TBranch        *b_frac01IdMvaAK5PFNoPUJet;   //!
@@ -2031,11 +2036,11 @@ public :
    TBranch        *b_weightedDz2AK5PFPUcorrJet;   //!
    TBranch        *b_betastarAK5PFPUcorrJet;   //!
    TBranch        *b_rmsCandsHandAK5PFPUcorrJet;   //!
-   TBranch        *b_jetIdMvaAK5PFPUcorrJet;   //!
+  //TBranch        *b_jetIdMvaAK5PFPUcorrJet;   //!
    TBranch        *b_nChargedIdMvaAK5PFPUcorrJet;   //!
    TBranch        *b_nNeutralsIdMvaAK5PFPUcorrJet;   //!
    TBranch        *b_dZIdMvaAK5PFPUcorrJet;   //!
-   TBranch        *b_nParticlesIdMvaAK5PFPUcorrJet;   //!
+  //TBranch        *b_nParticlesIdMvaAK5PFPUcorrJet;   //!
    TBranch        *b_dR2MeanIdMvaAK5PFPUcorrJet;   //!
    TBranch        *b_dRMeanIdMvaAK5PFPUcorrJet;   //!
    TBranch        *b_frac01IdMvaAK5PFPUcorrJet;   //!
@@ -2093,7 +2098,7 @@ public :
    TBranch        *b_sumETriangleHBHENoise;   //!
    TBranch        *b_nHFPMT;   //!
    TBranch        *b_sumEHFPMT;   //!
-   TBranch        *b_METFlags;   //!
+  //TBranch        *b_METFlags;   //!
 
    VecbosBase(TTree *tree=0);
    virtual ~VecbosBase();
@@ -2204,7 +2209,7 @@ void VecbosBase::Init(TTree *tree)
    fChain->SetBranchAddress("nHLT", &nHLT, &b_nHLT);
    fChain->SetBranchAddress("indexHLT", indexHLT, &b_indexHLT);
    fChain->SetBranchAddress("nameHLT", &nameHLT, &b_nameHLT);
-   fChain->SetBranchAddress("commentLHE", &commentLHE, &b_commentLHE);
+   //   fChain->SetBranchAddress("commentLHE", &commentLHE, &b_commentLHE);
    fChain->SetBranchAddress("nTriggerPaths", &nTriggerPaths, &b_nTriggerPaths);
    fChain->SetBranchAddress("nTriggerObsPassing", &nTriggerObsPassing, &b_nTriggerObsPassing);
    fChain->SetBranchAddress("sizePassing", sizePassing, &b_sizePassing);
@@ -2343,9 +2348,9 @@ void VecbosBase::Init(TTree *tree)
    fChain->SetBranchAddress("dr04ChargedHadronPFIsoPho", dr04ChargedHadronPFIsoPho, &b_dr04ChargedHadronPFIsoPho);
    fChain->SetBranchAddress("dr05ChargedHadronPFIsoPho", dr05ChargedHadronPFIsoPho, &b_dr05ChargedHadronPFIsoPho);
    fChain->SetBranchAddress("dr06ChargedHadronPFIsoPho", dr06ChargedHadronPFIsoPho, &b_dr06ChargedHadronPFIsoPho);
-   fChain->SetBranchAddress("dr03chPFIsoPho", dr03chPFIsoPho, &b_dr03chPFIsoPho);
-   fChain->SetBranchAddress("dr03nhPFIsoPho", dr03nhPFIsoPho, &b_dr03nhPFIsoPho);
-   fChain->SetBranchAddress("dr03phPFIsoPho", dr03phPFIsoPho, &b_dr03phPFIsoPho);
+   //   fChain->SetBranchAddress("dr03chPFIsoPho", dr03chPFIsoPho, &b_dr03chPFIsoPho);
+   //   fChain->SetBranchAddress("dr03nhPFIsoPho", dr03nhPFIsoPho, &b_dr03nhPFIsoPho);
+   //   fChain->SetBranchAddress("dr03phPFIsoPho", dr03phPFIsoPho, &b_dr03phPFIsoPho);
    fChain->SetBranchAddress("nConv", &nConv, &b_nConv);
    fChain->SetBranchAddress("pxPairConv", pxPairConv, &b_pxPairConv);
    fChain->SetBranchAddress("pyPairConv", pyPairConv, &b_pyPairConv);
@@ -2385,7 +2390,7 @@ void VecbosBase::Init(TTree *tree)
    fChain->SetBranchAddress("trk2PinConv", trk2PinConv, &b_trk2PinConv);
    fChain->SetBranchAddress("nSC", &nSC, &b_nSC);
    fChain->SetBranchAddress("nBCSC", nBCSC, &b_nBCSC);
-   fChain->SetBranchAddress("nCrystalsSC", nCrystalsSC, &b_nCrystalsSC);
+   //   fChain->SetBranchAddress("nCrystalsSC", nCrystalsSC, &b_nCrystalsSC);
    fChain->SetBranchAddress("rawEnergySC", rawEnergySC, &b_rawEnergySC);
    fChain->SetBranchAddress("energySC", energySC, &b_energySC);
    fChain->SetBranchAddress("seedClusterEnergySC", seedClusterEnergySC, &b_seedClusterEnergySC);
@@ -2542,6 +2547,7 @@ void VecbosBase::Init(TTree *tree)
    fChain->SetBranchAddress("esL2EnergyPhoPFSC", esL2EnergyPhoPFSC, &b_esL2EnergyPhoPFSC);
    fChain->SetBranchAddress("esL1StripsPhoPFSC", esL1StripsPhoPFSC, &b_esL1StripsPhoPFSC);
    fChain->SetBranchAddress("esL2StripsPhoPFSC", esL2StripsPhoPFSC, &b_esL2StripsPhoPFSC);
+   /*
    fChain->SetBranchAddress("nBC", &nBC, &b_nBC);
    fChain->SetBranchAddress("nCrystalsBC", nCrystalsBC, &b_nCrystalsBC);
    fChain->SetBranchAddress("energyBC", energyBC, &b_energyBC);
@@ -2616,6 +2622,7 @@ void VecbosBase::Init(TTree *tree)
    fChain->SetBranchAddress("sevClosProblPFBC", sevClosProblPFBC, &b_sevClosProblPFBC);
    fChain->SetBranchAddress("fracClosProblPFBC", fracClosProblPFBC, &b_fracClosProblPFBC);
    fChain->SetBranchAddress("indexSCPFBC", indexSCPFBC, &b_indexSCPFBC);
+   */
    fChain->SetBranchAddress("nTrack", &nTrack, &b_nTrack);
    fChain->SetBranchAddress("pxTrack", pxTrack, &b_pxTrack);
    fChain->SetBranchAddress("pyTrack", pyTrack, &b_pyTrack);
@@ -3011,6 +3018,7 @@ void VecbosBase::Init(TTree *tree)
    fChain->SetBranchAddress("vertexXGenMet", vertexXGenMet, &b_vertexXGenMet);
    fChain->SetBranchAddress("vertexYGenMet", vertexYGenMet, &b_vertexYGenMet);
    fChain->SetBranchAddress("vertexZGenMet", vertexZGenMet, &b_vertexZGenMet);
+   /*
    fChain->SetBranchAddress("nAK5Jet", &nAK5Jet, &b_nAK5Jet);
    fChain->SetBranchAddress("chargeAK5Jet", chargeAK5Jet, &b_chargeAK5Jet);
    fChain->SetBranchAddress("energyAK5Jet", energyAK5Jet, &b_energyAK5Jet);
@@ -3049,7 +3057,7 @@ void VecbosBase::Init(TTree *tree)
    fChain->SetBranchAddress("uncorrpxAK5PFPUcorrJet", uncorrpxAK5PFPUcorrJet, &b_uncorrpxAK5PFPUcorrJet);
    fChain->SetBranchAddress("uncorrpyAK5PFPUcorrJet", uncorrpyAK5PFPUcorrJet, &b_uncorrpyAK5PFPUcorrJet);
    fChain->SetBranchAddress("uncorrpzAK5PFPUcorrJet", uncorrpzAK5PFPUcorrJet, &b_uncorrpzAK5PFPUcorrJet);
-
+   */
    fChain->SetBranchAddress("nAK5PFNoPUJet", &nAK5PFNoPUJet, &b_nAK5PFNoPUJet);
    fChain->SetBranchAddress("chargeAK5PFNoPUJet", chargeAK5PFNoPUJet, &b_chargeAK5PFNoPUJet);
    fChain->SetBranchAddress("energyAK5PFNoPUJet", energyAK5PFNoPUJet, &b_energyAK5PFNoPUJet);
@@ -3077,15 +3085,16 @@ void VecbosBase::Init(TTree *tree)
    fChain->SetBranchAddress("HFHadronMultiplicityAK5PFNoPUJet", HFHadronMultiplicityAK5PFNoPUJet, &b_HFHadronMultiplicityAK5PFNoPUJet);
    fChain->SetBranchAddress("HFEMMultiplicityAK5PFNoPUJet", HFEMMultiplicityAK5PFNoPUJet, &b_HFEMMultiplicityAK5PFNoPUJet);
    fChain->SetBranchAddress("areaAK5PFNoPUJet", areaAK5PFNoPUJet, &b_areaAK5PFNoPUJet);
+   fChain->SetBranchAddress("pullAK5PFNoPUJet", pullAK5PFNoPUJet, &b_pullAK5PFNoPUJet);
    fChain->SetBranchAddress("weightedDz1AK5PFNoPUJet", weightedDz1AK5PFNoPUJet, &b_weightedDz1AK5PFNoPUJet);
    fChain->SetBranchAddress("weightedDz2AK5PFNoPUJet", weightedDz2AK5PFNoPUJet, &b_weightedDz2AK5PFNoPUJet);
    fChain->SetBranchAddress("betastarAK5PFNoPUJet", betastarAK5PFNoPUJet, &b_betastarAK5PFNoPUJet);
    fChain->SetBranchAddress("rmsCandsHandAK5PFNoPUJet", rmsCandsHandAK5PFNoPUJet, &b_rmsCandsHandAK5PFNoPUJet);
-   fChain->SetBranchAddress("jetIdMvaAK5PFNoPUJet", jetIdMvaAK5PFNoPUJet, &b_jetIdMvaAK5PFNoPUJet);
+   fChain->SetBranchAddress("jetIdMvaFullAK5PFNoPUJet", jetIdMvaAK5PFNoPUJet, &b_jetIdMvaAK5PFNoPUJet);
    fChain->SetBranchAddress("nChargedIdMvaAK5PFNoPUJet", nChargedIdMvaAK5PFNoPUJet, &b_nChargedIdMvaAK5PFNoPUJet);
    fChain->SetBranchAddress("nNeutralsIdMvaAK5PFNoPUJet", nNeutralsIdMvaAK5PFNoPUJet, &b_nNeutralsIdMvaAK5PFNoPUJet);
    fChain->SetBranchAddress("dZIdMvaAK5PFNoPUJet", dZIdMvaAK5PFNoPUJet, &b_dZIdMvaAK5PFNoPUJet);
-   fChain->SetBranchAddress("nParticlesIdMvaAK5PFNoPUJet", nParticlesIdMvaAK5PFNoPUJet, &b_nParticlesIdMvaAK5PFNoPUJet);
+   //fChain->SetBranchAddress("nParticlesIdMvaAK5PFNoPUJet", nParticlesIdMvaAK5PFNoPUJet, &b_nParticlesIdMvaAK5PFNoPUJet);
    fChain->SetBranchAddress("dR2MeanIdMvaAK5PFNoPUJet", dR2MeanIdMvaAK5PFNoPUJet, &b_dR2MeanIdMvaAK5PFNoPUJet);
    fChain->SetBranchAddress("dRMeanIdMvaAK5PFNoPUJet", dRMeanIdMvaAK5PFNoPUJet, &b_dRMeanIdMvaAK5PFNoPUJet);
    fChain->SetBranchAddress("frac01IdMvaAK5PFNoPUJet", frac01IdMvaAK5PFNoPUJet, &b_frac01IdMvaAK5PFNoPUJet);
@@ -3138,11 +3147,11 @@ void VecbosBase::Init(TTree *tree)
    fChain->SetBranchAddress("weightedDz2AK5PFPUcorrJet", weightedDz2AK5PFPUcorrJet, &b_weightedDz2AK5PFPUcorrJet);
    fChain->SetBranchAddress("betastarAK5PFPUcorrJet", betastarAK5PFPUcorrJet, &b_betastarAK5PFPUcorrJet);
    fChain->SetBranchAddress("rmsCandsHandAK5PFPUcorrJet", rmsCandsHandAK5PFPUcorrJet, &b_rmsCandsHandAK5PFPUcorrJet);
-   fChain->SetBranchAddress("jetIdMvaAK5PFPUcorrJet", jetIdMvaAK5PFPUcorrJet, &b_jetIdMvaAK5PFPUcorrJet);
+   //fChain->SetBranchAddress("jetIdMvaAK5PFPUcorrJet", jetIdMvaAK5PFPUcorrJet, &b_jetIdMvaAK5PFPUcorrJet);
    fChain->SetBranchAddress("nChargedIdMvaAK5PFPUcorrJet", nChargedIdMvaAK5PFPUcorrJet, &b_nChargedIdMvaAK5PFPUcorrJet);
    fChain->SetBranchAddress("nNeutralsIdMvaAK5PFPUcorrJet", nNeutralsIdMvaAK5PFPUcorrJet, &b_nNeutralsIdMvaAK5PFPUcorrJet);
    fChain->SetBranchAddress("dZIdMvaAK5PFPUcorrJet", dZIdMvaAK5PFPUcorrJet, &b_dZIdMvaAK5PFPUcorrJet);
-   fChain->SetBranchAddress("nParticlesIdMvaAK5PFPUcorrJet", nParticlesIdMvaAK5PFPUcorrJet, &b_nParticlesIdMvaAK5PFPUcorrJet);
+   //fChain->SetBranchAddress("nParticlesIdMvaAK5PFPUcorrJet", nParticlesIdMvaAK5PFPUcorrJet, &b_nParticlesIdMvaAK5PFPUcorrJet);
    fChain->SetBranchAddress("dR2MeanIdMvaAK5PFPUcorrJet", dR2MeanIdMvaAK5PFPUcorrJet, &b_dR2MeanIdMvaAK5PFPUcorrJet);
    fChain->SetBranchAddress("dRMeanIdMvaAK5PFPUcorrJet", dRMeanIdMvaAK5PFPUcorrJet, &b_dRMeanIdMvaAK5PFPUcorrJet);
    fChain->SetBranchAddress("frac01IdMvaAK5PFPUcorrJet", frac01IdMvaAK5PFPUcorrJet, &b_frac01IdMvaAK5PFPUcorrJet);
@@ -3200,8 +3209,8 @@ void VecbosBase::Init(TTree *tree)
    fChain->SetBranchAddress("sumETriangleHBHENoise", &sumETriangleHBHENoise, &b_sumETriangleHBHENoise);
    fChain->SetBranchAddress("nHFPMT", &nHFPMT, &b_nHFPMT);
    fChain->SetBranchAddress("sumEHFPMT", &sumEHFPMT, &b_sumEHFPMT);
-   fChain->SetBranchAddress("METFlags", &METFlags, &b_METFlags);
-   Notify();
+   //fChain->SetBranchAddress("METFlags", &METFlags, &b_METFlags);
+   //Notify();
 }
 
 Bool_t VecbosBase::Notify()

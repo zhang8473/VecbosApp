@@ -21,10 +21,26 @@ using namespace std;
 #include "CommonTools/include/TriggerMask.hh"
 #include "RazorHiggsBB.hh"
 
+#define aJETPT 20.//another jet pT cut
+#define JETPT 30.//jet pT cut
+#define JETETA 2.5
+#define HZ_MassMin 70.
+#define CSVL 0.244
+//#define CSVM 0.679
+#define CSVM 0.5
+#define CSVT 0.898
+#define FIRSTCSVCUT CSVT
+#define SECONDCSVCUT 0.5
+#define MuonSelection muonPassTight
+#define EleSelection electronPassWP95
+#define MET2CUT 80*80
+#define NUM_TREES 6
+
+//#define MYDEBUG
+
 RazorHiggsBB::RazorHiggsBB(TTree *tree) : Vecbos(tree) {
   _goodRunLS = false;
   _isData = false;
-  _weight = 1.;
 }
 
 RazorHiggsBB::RazorHiggsBB(TTree *tree, string json, bool goodRunLS, bool isData) : Vecbos(tree) {
@@ -40,8 +56,6 @@ RazorHiggsBB::RazorHiggsBB(TTree *tree, string json, bool goodRunLS, bool isData
   }
 }
 
-RazorHiggsBB::~RazorHiggsBB() {}
-
 void RazorHiggsBB::SetConditions(TTree* treeCond) {
   _treeCond = treeCond;
 }
@@ -50,99 +64,153 @@ void RazorHiggsBB::SetWeight(double weight) {
   _weight = weight;
 }
 
-void RazorHiggsBB::Loop(string outFileName, int start, int stop) {
+/*
+bool SortBTag(const pair<TLorentzVector,Double_t> &j1, const pair<TLorentzVector,Double_t> &j2) {
+  return ( j1.second>j2.second );
+}
+
+bool SortHZMass(const TLorentzVector &hz1, const TLorentzVector &hz2) {
+    return ( hz1.M2()>hz2.M2() );
+}
+*/
+
+void RazorHiggsBB::Loop(string outFileName, Long64_t start, Long64_t stop) {
   if(fChain == 0) return;
 
-  // prescaled RazorHiggsBB Triggers
+  /*  // prescaled RazorHiggsBB Triggers
   int HLT_R014_MR150;
   int HLT_R020_MR150;
   int HLT_R025_MR150;
+  */
 
   // hadronic razor triggers
-  int HLT_R020_MR550;
-  int HLT_R025_MR450;
-  int HLT_R033_MR350;
-  int HLT_R038_MR250;
+  Bool_t HLT_R020_MR550,HLT_R025_MR450,HLT_R033_MR350,HLT_R038_MR250;
 
-  // PF  block
-  int    passedPF;
-  double pTPFHem1;
-  double etaPFHem1;
-  double phiPFHem1;
-  double pTPFHem2;
-  double etaPFHem2;
-  double phiPFHem2;
-  double PFR;
-  double PFRsq;
-  double PFMR;
+  //MET
+  Double_t pfMET,DPhi_pfMET_trkMET,DPhi_pfMET_Jet;
 
   // general event info
-  double run;
-  double evNum;
-  double bx;
-  double ls;
-  double orbit;
-  int nPV;
-  double W;
+  UChar_t Naj,Nal,N_totaljets,OrderInEvent;// number of other jets and leptons
 
-  // Higgs variables are global
+  Double_t ptHZ,etaHZ,phiHZ,masssqHZ;//the HZ candidate
+  Double_t MAXBTAGAJet;// the max CVS of other jets
+  Double_t DPhi_pfMET_HZCands,DR_pfMET_HZCands;//the topological info of the inv HZ and the visible ZH
+  //Double_t ColorPullAngleHZCands;
+  Double_t BTAGHZ,jetareaHZ,jetpileupMVAHZ;//the merged HZ jet
 
   // prepare the output tree
-  TTree* outTree[6]; 
-  outTree[0] = new TTree("outTree2H2M", "outTree2H2M");
-  outTree[1] = new TTree("outTree2H1M", "outTree2H1M");
-  outTree[2] = new TTree("outTree2H0M", "outTree2H0M");
-  outTree[3] = new TTree("outTree1H1M", "outTree1H1M");
-  outTree[4] = new TTree("outTree1H0M", "outTree1H0M");
-  outTree[5] = new TTree("outTree0H", "outTree0H");
+  TTree* outTree[NUM_TREES];
+  //TBranch* treeBranches[100];  UChar_t NBranches=0;
+  char BranchTitle[100];
+  outTree[0] = new TTree("CombinedJetsRazor", "CombinedJetsRazor");
+  outTree[1] = new TTree("CombinedCSVLJetsRazor", "CombinedCSVLJetsRazor");
+  outTree[2] = new TTree("CombinedCSVMJetsRazor", "CombinedCSVMJetsRazor");
+  outTree[3] = new TTree("2BJetsRazor", "2BJetsRazor");
+  outTree[4] = new TTree("2BJetsHZ", "2BJetsHZ");
+  outTree[5] = new TTree("MergedJetsHZ", "MergedJetsHZ");
 
-  for(int i=0; i<6; i++) {
+#define MakeBranch(Name,Var,Type) sprintf(BranchTitle,"%s/%s",Name,Type); \
+  outTree[i]->Branch(Name, &Var,BranchTitle);
 
-    outTree[i]->Branch("HLT_R020_MR550", &HLT_R020_MR550, "HLT_R020_MR550/I");
-    outTree[i]->Branch("HLT_R025_MR450", &HLT_R025_MR450, "HLT_R025_MR450/I");
-    outTree[i]->Branch("HLT_R033_MR350", &HLT_R033_MR350, "HLT_R033_MR350/I");
-    outTree[i]->Branch("HLT_R038_MR250", &HLT_R038_MR250, "HLT_R038_MR250/I");
+  for(int i=0; i<NUM_TREES; i++) {
+    //event based selection
 
-    outTree[i]->Branch("run", &run, "run/D");
-    outTree[i]->Branch("evNum", &evNum, "evNum/D");
-    outTree[i]->Branch("bx", &bx, "bx/D");
-    outTree[i]->Branch("ls", &ls, "ls/D");
-    outTree[i]->Branch("orbit", &orbit, "orbit/D");
-    outTree[i]->Branch("nPV", &nPV, "nPV/I");
-    outTree[i]->Branch("W", &W, "W/D");
+    MakeBranch("HLT_R020_MR550", HLT_R020_MR550, "O");
+    MakeBranch("HLT_R025_MR450", HLT_R025_MR450, "O");
+    MakeBranch("HLT_R033_MR350", HLT_R033_MR350, "O");
+    MakeBranch("HLT_R038_MR250", HLT_R038_MR250, "O");
     
-    // PF block
-    outTree[i]->Branch("passedPF", &passedPF, "passedPF/I");
-    outTree[i]->Branch("pTPFHem1", &pTPFHem1, "pTPFHem1/D");
-    outTree[i]->Branch("etaPFHem1", &etaPFHem1, "etaPFHem1/D");
-    outTree[i]->Branch("phiPFHem1", &phiPFHem1, "phiPFHem1/D");
-    outTree[i]->Branch("pTPFHem2", &pTPFHem2, "pTPFHem2/D");
-    outTree[i]->Branch("etaPFHem2", &etaPFHem2, "etaPFHem2/D");
-    outTree[i]->Branch("phiPFHem2", &phiPFHem2, "phiPFHem2/D");
-    outTree[i]->Branch("PFR", &PFR, "PFR/D");
-    outTree[i]->Branch("PFRsq", &PFRsq, "PFRsq/D");
-    outTree[i]->Branch("PFMR", &PFMR, "PFMR/D");
-    
-    if(i<5) {
-      // first Higgs
-      outTree[i]->Branch("PFH1Pt",   &PFH1Pt, "PFH1Pt/D");
-      outTree[i]->Branch("PFH1Eta",  &PFH1Eta, "PFH1Eta/D");
-      outTree[i]->Branch("PFH1Phi",  &PFH1Phi, "PFH1Phi/D");
-      outTree[i]->Branch("PFH1Mass", &PFH1Mass, "PFH1Mass/D");
-      outTree[i]->Branch("MergedH1", &MergedH1, "MergedH1/I");
+    if (_isData) {
+      MakeBranch("run", runNumber, "I");
+      MakeBranch("evNum", eventNumber, "l");
+      MakeBranch("bx", bunchCrossing, "I");
+      MakeBranch("ls", lumiBlock, "I");
+      MakeBranch("orbit", orbitNumber, "I");
+    }
+    else {
+      MakeBranch("evNum", eventNumber, "l");
+      MakeBranch("nPU", nPU[1], "I");
     }
 
-    if(i<3) {
-      // second Higgs
-      outTree[i]->Branch("PFH2Pt",   &PFH2Pt, "PFH2Pt/D");
-      outTree[i]->Branch("PFH2Eta",  &PFH2Eta, "PFH2Eta/D");
-      outTree[i]->Branch("PFH2Phi",  &PFH2Phi, "PFH2Phi/D");
-      outTree[i]->Branch("PFH2Mass", &PFH2Mass, "PFH2Mass/D");
-      outTree[i]->Branch("MergedH2", &MergedH2, "MergedH2/I");
+    MakeBranch("W", _weight, "D");
+    MakeBranch("nPV", nPV, "I");
+
+    //number of other jets Jets.size()-2
+    MakeBranch("Naj", Naj, "b");
+    MakeBranch("Nal", Nal, "b");
+
+    //pfMET
+    MakeBranch("pfMET", pfMET, "D");
+    MakeBranch("pfMETphi", pfMETphi, "D");
+    MakeBranch("DPhi_pfMET_trkMET", DPhi_pfMET_trkMET, "D");//azimuthal opening angle between the direction of ET measured with particle flow objects vs. charged particles (tkMET). This variable helps in reducing residual QCD background in the Z(νν)H channel arising from events where there is a mismatch in the missing energy measured by the calorime-ters vs. the tracker. It also has the advantage of being indepedent of ∆φ(pfMET, J).
+    MakeBranch("DPhi_pfMET_Jet", DPhi_pfMET_Jet, "D");//azimuthal opening angle between the pfMET vector direction and the transverse momentum of the closest central jet in azimuth. Only jets satisfying pT > 30 GeV and |η | < 2.5 are considered. This variable helps in reducing residual QCD background in the Z(νν)H channel, where the source of the missing transverse energy is typically from fluctuations in the measured energy of a single jet.
+
+
+    if (i<5) {
+      //jet1
+      MakeBranch("pTJet1", Jet1.pT, "D");
+      MakeBranch("etaJet1", Jet1.eta, "D");
+      MakeBranch("phiJet1", Jet1.phi, "D");
+      MakeBranch("masssqJet1", Jet1.masssq, "D");
+      
+      //jet2
+      MakeBranch("pTJet2", Jet2.pT, "D");
+      MakeBranch("etaJet2", Jet2.eta, "D");
+      MakeBranch("phiJet2", Jet2.phi, "D");
+      MakeBranch("masssqJet2", Jet2.masssq, "D");
+    }
+    
+    if (i==3||i==4) {//jet_others
+      MakeBranch("BTAGJet1", Jet1.BTAG, "D");
+      MakeBranch("pileupMVAJet1", Jet1.pileupMVA, "D");
+      MakeBranch("areaJet1", Jet1.area, "D");
+      MakeBranch("pullJet1", Jet1.pull, "D");
+      MakeBranch("BTAGJet2", Jet2.BTAG, "D");
+      MakeBranch("pileupMVAJet2", Jet2.pileupMVA, "D");
+      MakeBranch("areaJet2", Jet2.area, "D");
+      MakeBranch("pullJet2", Jet2.pull, "D");
+    }
+
+    if (i>0) MakeBranch("MAXBTAGAJet", MAXBTAGAJet, "D");
+
+    if (i<5) {
+      // MakeBranch("ColorPullAngle",ColorPullAngleHZCands,"D");
+      MakeBranch("Deta_Jet1_Jet2",DEta_Jet1_Jet2,"D");
+      MakeBranch("DR_Jet1_Jet2",DR_Jet1_Jet2,"D");
+    }
+
+    if (i<4) {//Razor vars
+      //--R relating values and boost
+      MakeBranch("MRsq", MRsq, "D");
+      MakeBranch("RBeta", RBeta, "D");
+      //--RStar relating values and boost
+      MakeBranch("MRStarsq", MRStarsq, "D");
+      MakeBranch("MTRsq", MTRsq, "D");
+      MakeBranch("RStarsq", RStarsq, "D");
+      MakeBranch("RStarBetaL", RStarBetaL, "D");
+      MakeBranch("RStarBetaT", RStarBetaT, "D");      
+    }
+    else {//combined and merged HZ
+      MakeBranch("pTHZ",   ptHZ, "D");
+      MakeBranch("etaHZ",   etaHZ, "D");
+      MakeBranch("phiHZ",   phiHZ, "D");
+      MakeBranch("masssqHZ",   masssqHZ, "D");
+      //topological positions of the HZ candidate two daughters
+      MakeBranch("DPhi_H_Z",DPhi_pfMET_HZCands,"D");
+      MakeBranch("DR_H_Z",DR_pfMET_HZCands,"D");
+      if (i==5) {//merged HZ
+	MakeBranch("BTAGHZ",   Jet1.BTAG, "D");
+	MakeBranch("jetareaHZ",   Jet1.area, "D");
+	MakeBranch("jetpileupMVAHZ",  Jet1.pileupMVA, "D");
+	MakeBranch("jetpullHZ",  Jet1.pull, "D");
+      }
+      MakeBranch("OrderInEvent", OrderInEvent, "b");
     }
   }
 
-  //  double _weight = 1.;
+#define RENEWALL Jet1.pT=-9999.;Jet1.eta=-9999;Jet1.phi=-9999;Jet1.masssq=-9999;Jet1.BTAG=-9999;Jet1.pileupMVA=-9999;Jet1.area=-9999;Jet1.pull=-9999;Jet2.pT=-9999.;Jet2.eta=-9999;Jet2.phi=-9999;Jet2.masssq=-9999;Jet2.BTAG=-9999;Jet2.pileupMVA=-9999;Jet2.area=-9999;Jet2.pull=-9999;MAXBTAGAJet=-9999;DEta_Jet1_Jet2=-9999;DR_Jet1_Jet2=-9999;MRsq=-9999;RBeta=-9999;MRStarsq=-9999;MTRsq=-9999;RStarBetaL=-9999;RStarBetaT=-9999;ptHZ=-9999;etaHZ=-9999;phiHZ=-9999;masssqHZ=-9999;DPhi_pfMET_HZCands=-9999;DR_pfMET_HZCands=-9999;BTAGHZ=-9999;jetareaHZ=-9999;jetpileupMVAHZ=-9999;OrderInEvent=255
+
+  //  Double_t _weight = 1.;
   unsigned int lastLumi=0;
   unsigned int lastRun=0;
 
@@ -154,12 +222,20 @@ void RazorHiggsBB::Loop(string outFileName, int start, int stop) {
 
   Long64_t nbytes = 0;
   Long64_t nb = 0;
-  cout << "Number of entries = " << stop << endl;
-  for (Long64_t jentry=start;  jentry<stop;jentry++) {
+  if (_isData) {
+    cout << "Number of entries = " << stop <<endl;
+    _weight=1.;
+  }
+  else {
+    cout << "Number of entries = " << stop << "; xsec="<<_weight<< "; weight="<<_weight/Double_t(stop)<<endl;
+    _weight=_weight/Double_t(stop);
+  }
+  printf("Dummy");
+  for (Long64_t jentry=start;  jentry<stop;jentry++) {//start event loop
     Long64_t ientry = LoadTree(jentry);
     if (ientry < 0) break;
     nb = fChain->GetEntry(jentry);   nbytes += nb;
-    if (jentry%1000 == 0) cout << ">>> Processing event # " << jentry << endl;
+    if (jentry%100 == 0||jentry>stop-20) printf("\r>>> Processing event # %ld/%ld",jentry+1,stop);
 
     //IMPORTANT: FOR DATA RELOAD THE TRIGGER MASK PER FILE WHICH IS SUPPOSED TO CONTAIN UNIFORM CONDITIONS X FILE
     if(_isData) {
@@ -188,7 +264,7 @@ void RazorHiggsBB::Loop(string outFileName, int start, int stop) {
     
     // find highest-pT PV
     int iHighestPt = -99;
-    double HighestPt = -99999.;
+    Double_t HighestPt = -99999.;
     //if(nPV<1) continue;
     //for(int i=0; i< nPV; i++) if(SumPtPV[i] > HighestPt) iHighestPt = i;
     // PV selection
@@ -198,6 +274,7 @@ void RazorHiggsBB::Loop(string outFileName, int start, int stop) {
     // HCAL FLAGS
     if(_isData && !eventPassHcalFilter()) continue;
     //ECALTPFilterFlag 
+    /*
     if(_isData && METFlags << 0 == 0) continue;
     //drBoundary 
     if(_isData && METFlags << 1 == 0) continue;
@@ -209,373 +286,226 @@ void RazorHiggsBB::Loop(string outFileName, int start, int stop) {
     if(_isData && METFlags << 4 == 0) continue;
     // BE ECAL flag 
     if(_isData && METFlags << 5 == 0) continue;
-
+    */
+    // PFMET, PFMET cut
+    _MET=TVector3(pxPFMet[0], pyPFMet[0], 0.);
+    if ( _MET.Perp2()<MET2CUT ) continue;
+    //lepton veto
+    UShort_t NEle=0;
+    for(UShort_t i=0; i<nEle; i++)
+      if ( EleSelection(i) ) NEle++;
+    UShort_t NMuon=0;
+    for(UShort_t i=0; i<nMuon; i++)
+      if ( MuonSelection(i) ) NMuon++;
+    Nal=NEle+NMuon;
+    
+    pfMET=_MET.Mag();
+    pfMETphi=_MET.Phi();
+    TVector3 trkMET(pxTCMet[0], pyTCMet[0], 0.);//Track-Corrected MET
+    DPhi_pfMET_trkMET=OpeningAngle(pfMETphi,trkMET.Phi());
+    DPhi_pfMET_Jet=99.;
+    N_totaljets=0;
     // Jet selection 
-    bool goodPFevent = true;
-    vector<TLorentzVector> PFPUcorrJet; 
-    vector<double> PFPUcorrJetBTAG; 
-    for(int i=0; i< nAK5PFPUcorrJet; i++) {
-      // to avoid messages of 0 pT
-      if(sqrt(pow(pxAK5PFPUcorrJet[i],2.)+pow(pyAK5PFPUcorrJet[i],2.))<10.) continue;
-      TLorentzVector myJet(pxAK5PFPUcorrJet[i], pyAK5PFPUcorrJet[i], pzAK5PFPUcorrJet[i], energyAK5PFPUcorrJet[i]);
-      if(myJet.Pt()>40. && fabs(etaAK5PFPUcorrJet[i])< 2.4) {
-	PFPUcorrJet.push_back(myJet);
-	PFPUcorrJetBTAG.push_back(trackCountingHighEffBJetTagsAK5Jet[i]);
-      }
-      // check if the event is good (from PFJets ID point of view)                                                              
-      double EU = uncorrEnergyAK5PFPUcorrJet[i];
-      // Apply jet correction first                                                                                             
-      bool good_jet = false;
-      if (myJet.Pt() > 40.0 && fabs(etaAK5PFPUcorrJet[i]) < 3.0) {
-	double fHAD = (neutralHadronEnergyAK5PFPUcorrJet[i]+chargedHadronEnergyAK5PFPUcorrJet[i])/EU;
-	if (myJet.Pt() > 40.0 && fabs(etaAK5PFPUcorrJet[i]) < 3.0) {
-	  double fHAD = (neutralHadronEnergyAK5PFPUcorrJet[i]+chargedHadronEnergyAK5PFPUcorrJet[i])/EU;
-	  if(fHAD > 0.99) {
-	    goodPFevent = false;
-	    break;
+    Bool_t goodPFevent=true;
+    vector< pair<TLorentzVector,UShort_t> > Jets;
+    for(int i=0; i< nAK5PFNoPUJet; i++) {//start jet loop
+      Double_t pT2=pow(pxAK5PFNoPUJet[i],2.)+pow(pyAK5PFNoPUJet[i],2.);
+      if( pT2<aJETPT*aJETPT ) continue;
+      if( fabs(etaAK5PFNoPUJet[i])< 3.0 ) {//start eta 3.0 jets
+	Double_t EU = uncorrEnergyAK5PFNoPUJet[i],
+	  fnHAD = neutralHadronEnergyAK5PFNoPUJet[i]/EU,
+	  fcHAD = chargedHadronEnergyAK5PFNoPUJet[i]/EU,
+	  fnEM = neutralEmEnergyAK5PFNoPUJet[i]/EU,
+	  fcEM = chargedEmEnergyAK5PFNoPUJet[i]/EU,
+	  //fPhoton = photonEnergyAK5PFNoPUJet[i]/EU,
+	  chargedMultiplicity = chargedHadronMultiplicityAK5PFNoPUJet[i]+electronMultiplicityAK5PFNoPUJet[i]+muonMultiplicityAK5PFNoPUJet[i],
+	  neutralMultiplicity = neutralHadronMultiplicityAK5PFNoPUJet[i]+photonMultiplicityAK5PFNoPUJet[i];
+	if ( fnHAD+fcHAD > 0.99 ) { goodPFevent = false; break; }//Only hadron scattering means a bad event
+	if ( fnEM>0 || 
+	     muonEnergyAK5PFNoPUJet[i] > 0.0 ||
+	     ( fabs(etaAK5PFNoPUJet[i])  < JETETA && chargedEmEnergyAK5PFNoPUJet[i] > 0.0 ) ||
+	     ( fabs(etaAK5PFNoPUJet[i])  < JETETA && chargedHadronEnergyAK5PFNoPUJet[i] > 0.0 )
+	     ) {//Only forward electron/photon showering means a bad event
+	  if (fnHAD < 0.99 && fnEM<0.99 && chargedMultiplicity+neutralMultiplicity>1 && fcHAD>0.0 && chargedMultiplicity>0 && fcEM<0.99 && fabs(etaAK5PFNoPUJet[i])< JETETA ) {
+	    N_totaljets++;
+	    if ( pT2>=JETPT*JETPT ) {
+	      Float_t OpeningAnglewtMET=OpeningAngle(phiAK5PFNoPUJet[i],pfMETphi);
+	      if (OpeningAnglewtMET<DPhi_pfMET_Jet) DPhi_pfMET_Jet=OpeningAnglewtMET;
+	      Jets.push_back( make_pair(TLorentzVector(pxAK5PFNoPUJet[i], pyAK5PFNoPUJet[i], pzAK5PFNoPUJet[i], energyAK5PFNoPUJet[i]),i) );
+	    }
 	  }
-	  if (neutralEmEnergyAK5PFPUcorrJet[i] > 0.0 ) good_jet = true;
-	  if (fabs(etaAK5PFPUcorrJet[i])  < 2.4 && chargedEmEnergyAK5PFPUcorrJet[i] > 0.0 ) good_jet = true;
-	  if (fabs(etaAK5PFPUcorrJet[i])  < 2.4 && chargedHadronEnergyAK5PFPUcorrJet[i] > 0.0 ) good_jet = true;
-	  if (muonEnergyAK5PFPUcorrJet[i] > 0.0 ) good_jet = true;
-	  if (good_jet==false) {
-	    goodPFevent = false;
-	    break;
-	  }
+	}	
+	else {
+	  goodPFevent = false;
+	  clog<<"I found a bad PF event: Evt"<<eventNumber<<"--- fnEM:"<<fnEM<<";"<<endl;
+	  break;
 	}
-      }
-    }
-    if(goodPFevent == false) continue;
+      }//end eta 3.0 jets
+    }//end jet loop
+    if(goodPFevent == false || Jets.size()<2 ) continue;
 
-    // use PFMET
-    TVector3 MET(pxPFMet[0], pyPFMet[0], 0.);
+    SortBTags(Jets);
 
-    // dummy values
-    passedPF = 0;
-    pTPFHem1 = -9999;
-    etaPFHem1 = -9999;
-    phiPFHem1 = -9999;
-    pTPFHem2 = -9999;
-    etaPFHem2 = -9999;
-    phiPFHem2 = -9999;
-    PFR = -99999.;
-    PFRsq = -99999.;
-    PFMR = -99999.;
+    if (BTAG_Discriminator[Jets.front().second]<FIRSTCSVCUT) continue;
+    if (BTAG_Discriminator[Jets[1].second]<SECONDCSVCUT) continue;
 
-    // hemispheres and Razor selection
-    double RsqMin = 0.0; // to set after first plots
-    double mRmin = 0.0;  // to set after first plots
-    if(PFPUcorrJet.size()<2) continue;
-    vector<TLorentzVector> tmpJet = CombineJets(PFPUcorrJet);
-    if(tmpJet.size() <2) continue;
-    
-    TLorentzVector PFHem1 = tmpJet[0];
-    TLorentzVector PFHem2 = tmpJet[1];
-    
-    // compute boost
-    double num = PFHem1.P()-PFHem2.P();
-    double den = PFHem1.Pz()-PFHem2.Pz();      
-    
-    double MT = CalcMTR(PFHem1, PFHem2, MET);
-    double variable = -999999.;
-    double Rvariable = -999999.;
-    variable = CalcGammaMRstar(PFHem1, PFHem2);
-    if(variable >0) Rvariable = MT/variable;
+    //fill Branch 0: CombinedJetsRazor
+    //RENEWALL;
+    pair<TLorentzVector,TLorentzVector> CombinedJets = CombineJets(Jets,true);
+    SetRazor(CombinedJets.first,CombinedJets.second);
+    Naj=N_totaljets-Jets.size();
+    outTree[0]->Fill();
 
-    // fill the tree
-    passedPF = 1;
-    pTPFHem1 = PFHem1.Pt();
-    etaPFHem1 = PFHem1.Eta();
-    phiPFHem1 = PFHem1.Phi();
-    pTPFHem2 = PFHem2.Pt();
-    etaPFHem2 = PFHem2.Eta();
-    phiPFHem2 = PFHem2.Phi();
-    PFR = Rvariable;
-    PFRsq = Rvariable*Rvariable;
-    PFMR = variable;    
-
-    // baseline Razor selection
-    if(PFMR<RsqMin) continue;
-    if(PFRsq<RsqMin) continue;
-
-    ////////////////////////////////////////////////////////////
-    // look for the highest four btag jet
-    ////////////////////////////////////////////////////////////
-    int iBJet[4];
-
-    iBJet[0] = -99;
-    double btagOne = 0.;
-    for(int i=0; i<PFPUcorrJet.size();i++) {
-      if(trackCountingHighEffBJetTagsAK5Jet[i] > btagOne) {
-	btagOne = PFPUcorrJetBTAG[i];
-	iBJet[0] = i;
-      }
-    }
-
-    // look for the second highest btag
-    iBJet[1] = -99;
-    double btagTwo = 0;
-    for(int i=0; i<PFPUcorrJet.size();i++) {
-      if(i == iBJet[0]) continue;
-      if(trackCountingHighEffBJetTagsAK5Jet[i] > btagTwo) {
-	btagTwo = PFPUcorrJetBTAG[i];
-	iBJet[1] = i;
-      }
-    }
-
-    // look for the third highest btag
-    iBJet[2] = -99;
-    btagTwo = 0;
-    for(int i=0; i<PFPUcorrJet.size();i++) {
-      if(i == iBJet[0]) continue;
-      if(i == iBJet[1]) continue;
-      if(trackCountingHighEffBJetTagsAK5Jet[i] > btagTwo) {
-	btagTwo = PFPUcorrJetBTAG[i];
-	iBJet[2] = i;
-      }
-    }
-
-    // look for the fourth highest btag
-    iBJet[3] = -99;
-    btagTwo = 0;
-    for(int i=0; i<PFPUcorrJet.size();i++) {
-      if(i == iBJet[0]) continue;
-      if(i == iBJet[1]) continue;
-      if(i == iBJet[2]) continue;
-      if(trackCountingHighEffBJetTagsAK5Jet[i] > btagTwo) {
-	btagTwo = PFPUcorrJetBTAG[i];
-	iBJet[3] = i;
-      }
-    }
-
-    ////////////////////////////////////////////////////////////
-    // at least one BTag medium WP
-    if(btagOne < 3.3) continue; 
-    ////////////////////////////////////////////////////////////
-
-    // Are any of the best four btagged jets merged Higgses?
-    // by following the list order, we pick by default the most btag candidate
-    double mergedMassMin = 70.; 
-    vector<TLorentzVector> mergedHiggs;
-    vector<double> mergedHiggsBTAG;
-    vector<TLorentzVector> unmergedBJets;
-    vector<double> unmergedBJetsBTAG;
-    if(PFPUcorrJet[iBJet[0]].M() > mergedMassMin) {
-      mergedHiggs.push_back(PFPUcorrJet[iBJet[0]]);
-      mergedHiggsBTAG.push_back(PFPUcorrJetBTAG[iBJet[0]]);
-    } else {
-      unmergedBJets.push_back(PFPUcorrJet[iBJet[0]]);
-      unmergedBJetsBTAG.push_back(PFPUcorrJetBTAG[iBJet[0]]);
-    }
-    if(PFPUcorrJet[iBJet[1]].M() > mergedMassMin) {
-      mergedHiggs.push_back(PFPUcorrJet[iBJet[1]]);
-      mergedHiggsBTAG.push_back(PFPUcorrJetBTAG[iBJet[1]]);      
-    } else {
-      unmergedBJets.push_back(PFPUcorrJet[iBJet[1]]);
-      unmergedBJetsBTAG.push_back(PFPUcorrJetBTAG[iBJet[1]]);
-    }
-    if(iBJet[2] >= 0) {
-      if(PFPUcorrJet[iBJet[2]].M() > mergedMassMin) {
-	mergedHiggs.push_back(PFPUcorrJet[iBJet[2]]);
-	mergedHiggsBTAG.push_back(PFPUcorrJetBTAG[iBJet[2]]);      
-      } else {
-	unmergedBJets.push_back(PFPUcorrJet[iBJet[2]]);
-	unmergedBJetsBTAG.push_back(PFPUcorrJetBTAG[iBJet[2]]);
-      }
-    }
-    if(iBJet[3] >= 0) {
-      if(PFPUcorrJet[iBJet[3]].M() > mergedMassMin) {
-	mergedHiggs.push_back(PFPUcorrJet[iBJet[3]]);
-	mergedHiggsBTAG.push_back(PFPUcorrJetBTAG[iBJet[3]]);      
-      } else {
-	unmergedBJets.push_back(PFPUcorrJet[iBJet[3]]);
-	unmergedBJetsBTAG.push_back(PFPUcorrJetBTAG[iBJet[3]]);
-      }
-    }
-
-    // all the other jets
-    vector<TLorentzVector> unmergedJets;
-    vector<double> unmergedJetsBTAG;
-    for(int i=0; i<PFPUcorrJet.size();i++) {
-      if(i != iBJet[0] && i != iBJet[1] &&
-	 i != iBJet[2] && i != iBJet[3]) {
-	unmergedJets.push_back(PFPUcorrJet[i]);
-	unmergedJetsBTAG.push_back(PFPUcorrJetBTAG[i]);
-      }
-    }
-
-    ////////////////////////////////////////////
-    // the dijet Higgs candidates
-    ////////////////////////////////////////////
-
-    vector<TLorentzVector> unmergedHiggs;
-    double unmergedMassMin = 70.;
-
-    // combine unmerged bjets into dijet Higgs candidates
-    // - take the first entry in the list
-    // - loop over the others
-    // find the best-b pair with mass>threshold
-    // REMOVE the two jets if found
-    // REMOVE the first jet if not found
-    // THIS NEEDS at least two jets left in the bjet list
-    while(unmergedBJets.size() >= 2) {
-      int i2 = -99;
-      for(int i=1; i<unmergedBJets.size(); i++) {
-	TLorentzVector Higgs = unmergedBJets[0]+unmergedBJets[i];
-	// by following the list order we form the highest-btag combinations first
-	if(Higgs.M() > unmergedMassMin and i2<0) {
-	  i2 = i;
-	}
-      }
-      if(i2>0) {
-	// one combination found
-	unmergedHiggs.push_back(unmergedBJets[0]+unmergedBJets[i2]);
-	// remove the second leg 
-	unmergedBJets.erase(unmergedBJets.begin()+i2);
-	unmergedBJetsBTAG.erase(unmergedBJetsBTAG.begin()+i2);
-      }
-      // remove the first leg
-      unmergedBJets.erase(unmergedBJets.begin());
-      unmergedBJetsBTAG.erase(unmergedBJetsBTAG.begin());
-    }
-
-    // for each bjet left in the list
-    // combine it with one non-bjet such that 
-    // the mass is above threshold
-    // pick the candidate with the highest sum of btags
-    // in case more candidates are present
-    for(int i1 = 0; i1< unmergedBJets.size(); i1++) {
-      int iBest2 = -99;
-      double bestBTAG = 0.;
-      // take a second leg from non-bjet
-      for(int i2=0; i2<unmergedJets.size();i2++) {
-	// form the Higgs candidate
-	TLorentzVector Higgs = unmergedJets[i2]+unmergedBJets[i1];
-	if(Higgs.M() > unmergedMassMin && unmergedJetsBTAG[i2] > bestBTAG) {
-	  bestBTAG = unmergedJetsBTAG[i2];
-	  iBest2 = i2;
-	}
-      }
-      // if a candidate was found
-      if(iBest2>=0) {
-	// - append it to the merged Higgs 
-	unmergedHiggs.push_back(unmergedBJets[i1]+unmergedJets[iBest2]);
-	//-  remove the second leg from the nobjet list
-	unmergedBJets.erase(unmergedBJets.begin()+iBest2);
-	unmergedBJetsBTAG.erase(unmergedBJetsBTAG.begin()+iBest2);
-      }
-    }
-
-    // initialization
-    PFH1Pt = -99.;
-    PFH1Eta = -99.;
-    PFH1Phi = -99.;
-    PFH1Mass = -99.;
-    MergedH1 = -99;
-    PFH2Pt = -99.;
-    PFH2Eta = -99.;
-    PFH2Phi = -99.;
-    PFH2Mass = -99.;
-    MergedH2 = -99;
-
-    if(mergedHiggs.size()>=2) {
-      // 2H2Me box
-      SetFirstHiggs(mergedHiggs[0], true);
-      SetSecondHiggs(mergedHiggs[1], true);
-      outTree[0]->Fill();
-    } else if(mergedHiggs.size()>=1 and unmergedHiggs.size()>=1) {
-      // 2H1Me box
-      SetFirstHiggs(mergedHiggs[0], true);
-      SetSecondHiggs(unmergedHiggs[0], false);
+    //fill Branch 1: CombinedCSVLJetsRazor
+    //RENEWALL;
+    vector< pair<TLorentzVector,UShort_t> >::iterator CSVL_Jet=Jets.begin();
+    for (;CSVL_Jet!=Jets.end();CSVL_Jet++)
+      if (BTAG_Discriminator[CSVL_Jet->second]<CSVL) break;
+    if ( CSVL_Jet-Jets.begin()>1 ) {
+      if ( CSVL_Jet!=Jets.end() ) MAXBTAGAJet=BTAG_Discriminator[CSVL_Jet->second];
+      else MAXBTAGAJet=0;
+#ifdef MYDEBUG
+      cerr<<"njets="<<CSVL_Jet-Jets.begin()<<";CSVL_="<<BTAG_Discriminator[(CSVL_Jet-1)->second]<<endl;
+#endif
+      CombinedJets = CombineJets(vector< pair<TLorentzVector,UShort_t> >(Jets.begin(),CSVL_Jet),true);
+      SetRazor(CombinedJets.first,CombinedJets.second);
+      Naj=N_totaljets-(CSVL_Jet-Jets.begin());
       outTree[1]->Fill();
-    } else if(unmergedHiggs.size()>=2) {
-      // 2H0Me box
-      SetFirstHiggs(unmergedHiggs[0], false);
-      SetSecondHiggs(unmergedHiggs[1], false);
-      outTree[2]->Fill();
-    } else if(mergedHiggs.size()>0) {
-      // 1H1Me
-      SetFirstHiggs(mergedHiggs[0], true);
-      outTree[3]->Fill();
-    } else if(unmergedHiggs.size()>0) {
-      SetFirstHiggs(unmergedHiggs[0], false);
-      outTree[4]->Fill();
-    } else {
-      // 0H
-      outTree[5]->Fill();
     }
-  }
 
+    //fill Branch 2: CombinedCSVMJetsRazor
+    //RENEWALL;
+    vector< pair<TLorentzVector,UShort_t> >::iterator CSVM_Jet=Jets.begin();
+    for (;CSVM_Jet!=Jets.end();CSVM_Jet++)
+      if (BTAG_Discriminator[CSVM_Jet->second]<CSVM) break;
+    if ( CSVM_Jet-Jets.begin()>1 ) {
+      if ( CSVM_Jet!=Jets.end() ) MAXBTAGAJet=BTAG_Discriminator[CSVM_Jet->second];
+      else MAXBTAGAJet=0;
+#ifdef MYDEBUG
+      cerr<<"njets="<<CSVM_Jet-Jets.begin()<<";CSVM_="<<BTAG_Discriminator[(CSVM_Jet-1)->second]<<endl;
+#endif
+      CombinedJets = CombineJets(vector< pair<TLorentzVector,UShort_t> >(Jets.begin(),CSVM_Jet),true);
+      SetRazor(CombinedJets.first,CombinedJets.second);
+      Naj=N_totaljets-(CSVM_Jet-Jets.begin());
+      outTree[2]->Fill();
+    }
+    
+    //fill Branch 3: 2BJetsRazor
+    //RENEWALL;
+    SetRazor(Jets[0].first,Jets[1].first);
+    SetJets_Others(Jets[0].second,Jets[1].second);
+    if (Jets.size()>2) MAXBTAGAJet=BTAG_Discriminator[Jets[2].second];
+    else MAXBTAGAJet=0;
+    Naj=N_totaljets-2;
+    outTree[3]->Fill();
+    
+    //fill Branch 4: 2BJetsHZ
+    //RENEWALL;
+    OrderInEvent=0;
+    for ( UChar_t i=0;i<Jets.size()-1;i++ )
+      if ( BTAG_Discriminator[Jets[i].second]>FIRSTCSVCUT )
+	for ( UChar_t j=i+1;j<Jets.size();j++ )
+	  if ( BTAG_Discriminator[Jets[i].second]>SECONDCSVCUT )  {
+	    TLorentzVector HZ = Jets[i].first+Jets[j].first;
+	    if ( HZ.M()>HZ_MassMin ) {
+	      Jet1.pT=Jets[i].first.Pt();
+	      Jet1.eta=Jets[i].first.Eta();
+	      Jet1.phi=Jets[i].first.Phi();
+	      Jet1.masssq=Jets[i].first.M2();
+	      Jet2.pT=Jets[j].first.Pt();
+	      Jet2.eta=Jets[j].first.Eta();
+	      Jet2.phi=Jets[j].first.Phi();
+	      Jet2.masssq=Jets[j].first.M2();
+	      SetJets_Others(Jets[i].second,Jets[j].second);
+	      ptHZ=HZ.Pt();
+	      etaHZ=HZ.Eta();
+	      phiHZ=HZ.Phi();
+	      masssqHZ=HZ.M2();
+	      DEta_Jet1_Jet2=Jet1.eta-Jet2.eta;
+	      DR_Jet1_Jet2=sqrt( pow(DEta_Jet1_Jet2,2)+pow(Jet1.phi-Jet2.phi,2) );
+	      DPhi_pfMET_HZCands=OpeningAngle(HZ.Phi(),_MET.Phi());
+	      DR_pfMET_HZCands=sqrt( pow(HZ.Eta()-_MET.Eta(),2)+DPhi_pfMET_HZCands*DPhi_pfMET_HZCands );
+	      if ( j+1<Jets.size() ) MAXBTAGAJet=BTAG_Discriminator[Jets[j+1].second];
+	      else MAXBTAGAJet=0;
+	      Naj=N_totaljets-2;
+	      outTree[4]->Fill();
+	      OrderInEvent++;
+	    }
+	  }
+    
+    //fill Branch 5: Merged HZ
+    //RENEWALL;
+    OrderInEvent=0;
+    for ( UChar_t i=0;i<Jets.size();i++ ) 
+      if (Jets[i].first.M() > HZ_MassMin) {
+	ptHZ=Jets[i].first.Pt();
+	etaHZ=Jets[i].first.Eta();
+	phiHZ=Jets[i].first.Phi();
+	masssqHZ=Jets[i].first.M2();
+	SetJets_Others(Jets[i].second,0);
+	DPhi_pfMET_HZCands=OpeningAngle(Jets[i].first.Phi(),_MET.Phi());
+	DR_pfMET_HZCands=sqrt( pow(Jets[i].first.Eta()-_MET.Eta(),2)+DPhi_pfMET_HZCands*DPhi_pfMET_HZCands );
+	if ( i+1<Jets.size() ) MAXBTAGAJet=BTAG_Discriminator[Jets[i+1].second];
+	else MAXBTAGAJet=0;
+	Naj=N_totaljets-1;
+	outTree[5]->Fill();
+	OrderInEvent++;
+      }
+  }//end the event loop
+  printf("\nOutput to %s\n",outFileName.c_str());
   TFile *file = new TFile(outFileName.c_str(),"RECREATE");
-  for(int i=0; i<6; i++) 
+  for(int i=0; i<NUM_TREES; i++) 
     outTree[i]->Write();
   file->Close();
 }
   
-void RazorHiggsBB::SetFirstHiggs(TLorentzVector myHiggs, int merged) {
-  PFH1Pt = myHiggs.Pt();
-  PFH1Eta = myHiggs.Eta();
-  PFH1Phi = myHiggs.Phi();
-  PFH1Mass = myHiggs.M();
-  MergedH1  = merged;
-}
-
-void RazorHiggsBB::SetSecondHiggs(TLorentzVector myHiggs, int merged) {
-  PFH2Pt = myHiggs.Pt();
-  PFH2Eta = myHiggs.Eta();
-  PFH2Phi = myHiggs.Phi();
-  PFH2Mass = myHiggs.M();
-  MergedH2  = merged;
-}
-
-vector<TLorentzVector> RazorHiggsBB::CombineJets(vector<TLorentzVector> myjets){
+pair<TLorentzVector,TLorentzVector> RazorHiggsBB::CombineJets(const vector< pair<TLorentzVector,UShort_t> > &myjets, const Bool_t SmallestSqMass){
   
-  vector<TLorentzVector> mynewjets;
-  TLorentzVector j1, j2;
-  bool foundGood = false;
+  pair<TLorentzVector,TLorentzVector> CombinedJets;
   
   int N_comb = 1;
-  for(int i = 0; i < myjets.size(); i++){
+  for(int i = 0; i < myjets.size()-1; i++){
     N_comb *= 2;
   }
-  
-  double M_min = 9999999999.0;
+#ifdef MYDEBUG
+  cerr<<endl<<myjets.size()<<" jets -- ";
+#endif
+  Double_t M_Extreme = SmallestSqMass?9999999999.0:0.;
   int j_count;
-  for(int i = 1; i < N_comb-1; i++){
+  for(int i = 1; i < N_comb; i++){
     TLorentzVector j_temp1, j_temp2;
-    int itemp = i;
-    j_count = N_comb/2;
-    int count = 0;
-    while(j_count > 0){
-      if(itemp/j_count == 1){
-	j_temp1 += myjets[count];
-      } else {
-	j_temp2 += myjets[count];
-      }
-      itemp -= j_count*(itemp/j_count);
-      j_count /= 2;
+    int itemp = i, count = 0;
+    while ( itemp > 0) {
+      if(itemp%2) j_temp1 += myjets[count].first;
+      else j_temp2 += myjets[count].first;
+#ifdef MYDEBUG
+      cerr<<itemp%2;
+#endif
+      itemp/=2;
       count++;
-    }    
-    double M_temp = j_temp1.M2()+j_temp2.M2();
-    // smallest mass
-    if(M_temp < M_min){
-      M_min = M_temp;
-      j1 = j_temp1;
-      j2 = j_temp2;
+    }
+    for (vector< pair<TLorentzVector,UShort_t> >::const_iterator jet=myjets.begin()+count;jet!=myjets.end();jet++) {
+      j_temp2+=jet->first;
+#ifdef MYDEBUG
+      cerr<<0;
+#endif
+    }
+#ifdef MYDEBUG
+    cerr<<":";
+#endif
+    Double_t M_temp = j_temp1.M2()+j_temp2.M2();
+    if ( (SmallestSqMass && M_temp < M_Extreme) ||
+	 (!SmallestSqMass && M_temp > M_Extreme)
+	 ){
+      M_Extreme = M_temp;
+      CombinedJets.first = j_temp1;
+      CombinedJets.second = j_temp2;
     }
   }
 
-  // set masses to 0
-  //j1.SetPtEtaPhiM(j1.Pt(),j1.Eta(),j1.Phi(),0.0);
-  //j2.SetPtEtaPhiM(j2.Pt(),j2.Eta(),j2.Phi(),0.0);
-  if(j2.Pt() > j1.Pt()){
-    TLorentzVector temp = j1;
-    j1 = j2;
-    j2 = temp;
-  }
-  
-  mynewjets.push_back(j1);
-  mynewjets.push_back(j2);
-  return mynewjets;  
+  if(CombinedJets.second.Pt() > CombinedJets.first.Pt()) swap(CombinedJets.first,CombinedJets.second);
+#ifdef MYDEBUG
+  cerr<<endl;
+#endif
+  return CombinedJets;  
 }
-

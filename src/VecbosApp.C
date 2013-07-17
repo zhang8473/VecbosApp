@@ -173,16 +173,14 @@ int main(int argc, char* argv[]) {
       {
 	sscanf(Buffer,"%s",MyRootFile);
 	if(string(MyRootFile).find("eos") != std::string::npos)
-   {
-      if(string(MyRootFile).find("root:") == std::string::npos)
-         theChain->Add("root:/"+TString(MyRootFile));
-      else
-         theChain->Add(TString(MyRootFile));
-   }
-   else
-	  theChain->Add("rfio:"+TString(MyRootFile));
-
-        // theChain->Add("root://castorcms/"+TString(MyRootFile));
+	  {
+	    if(string(MyRootFile).find("root:") == std::string::npos)
+	      theChain->Add("root:/"+TString(MyRootFile));
+	    else
+	      theChain->Add(TString(MyRootFile));
+	  }
+	else theChain->Add(TString(MyRootFile));
+	// theChain->Add("root://castorcms/"+TString(MyRootFile));
 	//        theChain->Add(TString(MyRootFile));
 	std::cout << "chaining " << MyRootFile << std::endl;
 	//	if ( nfiles==1 ) {
@@ -200,15 +198,15 @@ int main(int argc, char* argv[]) {
   delete inputFile;
   // get additional input options
   int signal = 0;
-  int start = 0;
-  int stop  = theChain->GetEntries();
+  Long64_t start = 0;
+  Long64_t stop  = theChain->GetEntries();
   bool isData = false;
   float lumi = -999.;
   float xsec = -999.;
   float weight = 1.;
   for (int i=1;i<argc;i++){
-    if (strncmp(argv[i],"-start",6)==0) sscanf(argv[i],"-start=%i",&start);
-    if (strncmp(argv[i],"-stop",5)==0)  sscanf(argv[i],"-stop=%i",&stop);
+    if (strncmp(argv[i],"-start",6)==0) sscanf(argv[i],"-start=%ld",&start);
+    if (strncmp(argv[i],"-stop",5)==0)  sscanf(argv[i],"-stop=%ld",&stop);
     if (strncmp(argv[i],"-signal",7)==0)  sscanf(argv[i],"-signal=%i",&signal);
     if (strncmp(argv[i],"-weight",7)==0)  sscanf(argv[i],"-weight=%f",&weight);
     if (strncmp(argv[i],"--isData",8)==0)  isData = true;
@@ -626,9 +624,11 @@ int main(int argc, char* argv[]) {
 #if Application == 22
   if(isData) {
     RazorLeptons vecbos(theChain, string(json), true, true);
+    vecbos.SetWeight(double(weight));
     vecbos.Loop(string(outFileName), start, stop);
   } else {
     RazorLeptons vecbos(theChain, string(json), false, false);
+    vecbos.SetWeight(double(weight));
     vecbos.Loop(string(outFileName), start, stop);
   }
 #endif
@@ -636,9 +636,11 @@ int main(int argc, char* argv[]) {
 #if Application == 24
   if(isData) {
     RazorHiggsBB vecbos(theChain, string(json), true, true);
+    vecbos.SetWeight(double(weight));
     vecbos.Loop(string(outFileName), start, stop);
   } else {
     RazorHiggsBB vecbos(theChain, string(json), false, false);
+    vecbos.SetWeight(double(weight));
     vecbos.Loop(string(outFileName), start, stop);
   }
 #endif
@@ -751,7 +753,7 @@ int main(int argc, char* argv[]) {
   vecbos.Loop(string(outFileName), start, stop);
 #endif
 
-  system("rm thisiswhyitcrashed*");
+  system("if [ -f thisiswhyitcrashed* ]; then rm thisiswhyitcrashed*; fi");
   
   return 0;
 
