@@ -138,7 +138,7 @@ lib: 	$(OUTLIBCOMMON)Conditions.o \
 	$(OUTLIB)TestAnalysis.o \
 	$(OUTLIB)DiJet.o \
 	$(OUTLIB)RazorHiggsBB.o \
-	$(OUTLIB)RazorMultiB.o \
+#	$(OUTLIB)RazorMultiB.o \
 	$(OUTLIB)MonoJet.o \
 	$(OUTLIB)CandleCalib.o \
 	$(OUTLIB)VBTFLeptEff.o \
@@ -191,8 +191,8 @@ $(OUTLIB)DiJet.o: $(SRCDIR)DiJet.cc $(OUTLIB)Vecbos.o
 $(OUTLIB)RazorHiggsBB.o: $(SRCDIR)RazorHiggsBB.cc $(OUTLIB)Vecbos.o $(OUTLIB)SUSYNLO.o
 	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)RazorHiggsBB.o $<
 
-$(OUTLIB)RazorMultiB.o: $(SRCDIR)RazorMultiB.cc $(OUTLIB)Vecbos.o
-	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)RazorMultiB.o $<
+#$(OUTLIB)RazorMultiB.o: $(SRCDIR)RazorMultiB.cc $(OUTLIB)Vecbos.o
+#	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)RazorMultiB.o $<
 
 $(OUTLIB)MonoJet.o: $(SRCDIR)MonoJet.cc $(OUTLIB)Vecbos.o
 	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)MonoJet.o $<
