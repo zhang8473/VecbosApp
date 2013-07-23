@@ -92,9 +92,7 @@ void RazorHiggsBB::Loop(string outFileName, Long64_t start, Long64_t stop) {
   // general event info
   UChar_t Naj,Nal,N_totaljets,OrderInEvent;// number of other jets and leptons
 
-  Double_t ptHZ,etaHZ,phiHZ,masssqHZ;//the HZ candidate
   Double_t MAXBTAGAJet;// the max CVS of other jets
-  Double_t DPhi_pfMET_HZCands,DR_pfMET_HZCands;//the topological info of the inv HZ and the visible ZH
   //Double_t ColorPullAngleHZCands;
   Double_t BTAGHZ,jetareaHZ,jetpileupMVAHZ;//the merged HZ jet
 
@@ -105,7 +103,7 @@ void RazorHiggsBB::Loop(string outFileName, Long64_t start, Long64_t stop) {
   outTree[0] = new TTree("CombinedJetsRazor", "CombinedJetsRazor");
   outTree[1] = new TTree("CombinedCSVLJetsRazor", "CombinedCSVLJetsRazor");
   outTree[2] = new TTree("CombinedCSVMJetsRazor", "CombinedCSVMJetsRazor");
-  outTree[3] = new TTree("2BJetsRazor", "2BJetsRazor");
+  outTree[3] = new TTree("2BestCSVJetsRazor", "2BestCSVJetsRazor");
   outTree[4] = new TTree("2BJetsHZ", "2BJetsHZ");
   outTree[5] = new TTree("MergedJetsHZ", "MergedJetsHZ");
 
@@ -177,9 +175,6 @@ void RazorHiggsBB::Loop(string outFileName, Long64_t start, Long64_t stop) {
       // MakeBranch("ColorPullAngle",ColorPullAngleHZCands,"D");
       MakeBranch("Deta_Jet1_Jet2",DEta_Jet1_Jet2,"D");
       MakeBranch("DR_Jet1_Jet2",DR_Jet1_Jet2,"D");
-    }
-
-    if (i<4) {//Razor vars
       //--R relating values and boost
       MakeBranch("MRsq", MRsq, "D");
       MakeBranch("RBeta", RBeta, "D");
@@ -190,22 +185,22 @@ void RazorHiggsBB::Loop(string outFileName, Long64_t start, Long64_t stop) {
       MakeBranch("RStarBetaL", RStarBetaL, "D");
       MakeBranch("RStarBetaT", RStarBetaT, "D");      
     }
-    else {//combined and merged HZ
-      MakeBranch("pTHZ",   ptHZ, "D");
-      MakeBranch("etaHZ",   etaHZ, "D");
-      MakeBranch("phiHZ",   phiHZ, "D");
-      MakeBranch("masssqHZ",   masssqHZ, "D");
-      //topological positions of the HZ candidate two daughters
-      MakeBranch("DPhi_H_Z",DPhi_pfMET_HZCands,"D");
-      MakeBranch("DR_H_Z",DR_pfMET_HZCands,"D");
-      if (i==5) {//merged HZ
+
+    //kinematic variables of the HZ candidate two daughters
+    MakeBranch("pTHZ",   ptHZ, "D");
+    MakeBranch("etaHZ",   etaHZ, "D");
+    MakeBranch("phiHZ",   phiHZ, "D");
+    MakeBranch("masssqHZ",   masssqHZ, "D");
+    //topological positions of the HZ candidate two daughters
+    MakeBranch("DPhi_H_Z",DPhi_pfMET_HZCands,"D");
+    MakeBranch("DR_H_Z",DR_pfMET_HZCands,"D");
+    if (i==5) {//merged HZ
 	MakeBranch("BTAGHZ",   Jet1.BTAG, "D");
 	MakeBranch("jetareaHZ",   Jet1.area, "D");
 	MakeBranch("jetpileupMVAHZ",  Jet1.pileupMVA, "D");
 	MakeBranch("jetpullHZ",  Jet1.pull, "D");
-      }
-      MakeBranch("OrderInEvent", OrderInEvent, "b");
     }
+    MakeBranch("OrderInEvent", OrderInEvent, "b");
   }
 
 #define RENEWALL Jet1.pT=-9999.;Jet1.eta=-9999;Jet1.phi=-9999;Jet1.masssq=-9999;Jet1.BTAG=-9999;Jet1.pileupMVA=-9999;Jet1.area=-9999;Jet1.pull=-9999;Jet2.pT=-9999.;Jet2.eta=-9999;Jet2.phi=-9999;Jet2.masssq=-9999;Jet2.BTAG=-9999;Jet2.pileupMVA=-9999;Jet2.area=-9999;Jet2.pull=-9999;MAXBTAGAJet=-9999;DEta_Jet1_Jet2=-9999;DR_Jet1_Jet2=-9999;MRsq=-9999;RBeta=-9999;MRStarsq=-9999;MTRsq=-9999;RStarBetaL=-9999;RStarBetaT=-9999;ptHZ=-9999;etaHZ=-9999;phiHZ=-9999;masssqHZ=-9999;DPhi_pfMET_HZCands=-9999;DR_pfMET_HZCands=-9999;BTAGHZ=-9999;jetareaHZ=-9999;jetpileupMVAHZ=-9999;OrderInEvent=255
@@ -298,6 +293,7 @@ void RazorHiggsBB::Loop(string outFileName, Long64_t start, Long64_t stop) {
     for(UShort_t i=0; i<nMuon; i++)
       if ( MuonSelection(i) ) NMuon++;
     Nal=NEle+NMuon;
+    if (Nal>0) continue;
     
     pfMET=_MET.Mag();
     pfMETphi=_MET.Phi();
@@ -408,23 +404,12 @@ void RazorHiggsBB::Loop(string outFileName, Long64_t start, Long64_t stop) {
 	  if ( BTAG_Discriminator[Jets[i].second]>SECONDCSVCUT )  {
 	    TLorentzVector HZ = Jets[i].first+Jets[j].first;
 	    if ( HZ.M()>HZ_MassMin ) {
-	      Jet1.pT=Jets[i].first.Pt();
-	      Jet1.eta=Jets[i].first.Eta();
-	      Jet1.phi=Jets[i].first.Phi();
-	      Jet1.masssq=Jets[i].first.M2();
-	      Jet2.pT=Jets[j].first.Pt();
-	      Jet2.eta=Jets[j].first.Eta();
-	      Jet2.phi=Jets[j].first.Phi();
-	      Jet2.masssq=Jets[j].first.M2();
+	      SetRazor(Jets[i].first,Jets[j].first);
 	      SetJets_Others(Jets[i].second,Jets[j].second);
 	      ptHZ=HZ.Pt();
 	      etaHZ=HZ.Eta();
 	      phiHZ=HZ.Phi();
 	      masssqHZ=HZ.M2();
-	      DEta_Jet1_Jet2=Jet1.eta-Jet2.eta;
-	      DR_Jet1_Jet2=sqrt( pow(DEta_Jet1_Jet2,2)+pow(Jet1.phi-Jet2.phi,2) );
-	      DPhi_pfMET_HZCands=OpeningAngle(HZ.Phi(),_MET.Phi());
-	      DR_pfMET_HZCands=sqrt( pow(HZ.Eta()-_MET.Eta(),2)+DPhi_pfMET_HZCands*DPhi_pfMET_HZCands );
 	      if ( j+1<Jets.size() ) MAXBTAGAJet=BTAG_Discriminator[Jets[j+1].second];
 	      else MAXBTAGAJet=0;
 	      Naj=N_totaljets-2;

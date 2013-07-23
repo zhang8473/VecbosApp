@@ -83,7 +83,8 @@ private:
   Double_t pfMETphi;
   Double_t MRsq,RBeta,MRStarsq,MTRsq,RStarsq,RStarBetaL,RStarGammaL,RStarBetaT;
   Double_t DEta_Jet1_Jet2,DR_Jet1_Jet2;//the topological info of the HZ candidate two daughters
-
+  Double_t ptHZ,etaHZ,phiHZ,masssqHZ;//the HZ candidate
+  Double_t DPhi_pfMET_HZCands,DR_pfMET_HZCands;//the topological info of the inv HZ and the visible ZH
   inline void SetRazor(const TLorentzVector J1, const TLorentzVector J2) {
     // the two jets
     Jet1.pT=J1.Pt();
@@ -94,6 +95,8 @@ private:
     Jet2.eta=J2.Eta();
     Jet2.phi=J2.Phi();
     Jet2.masssq=J2.M2();
+    DEta_Jet1_Jet2=Jet1.eta-Jet2.eta;
+    DR_Jet1_Jet2=sqrt( pow(DEta_Jet1_Jet2,2)+pow(Jet1.phi-Jet2.phi,2) );
     //calculte the Razor variables
     //--R relating values and boost
     MRsq = CalcMRsq(J1, J2);
@@ -110,6 +113,13 @@ private:
     RStarBetaT = CalcRStarBetaT(J1, J2);
     DEta_Jet1_Jet2 = J1.Eta()-J2.Eta();
     DR_Jet1_Jet2=sqrt( pow(DEta_Jet1_Jet2,2)+pow(J1.Phi()-J2.Phi(),2) );
+    TLorentzVector HZ = J1+J2;
+    ptHZ=HZ.Pt();
+    etaHZ=HZ.Eta();
+    phiHZ=HZ.Phi();
+    masssqHZ=HZ.M2();
+    DPhi_pfMET_HZCands=OpeningAngle(HZ.Phi(),_MET.Phi());
+    DR_pfMET_HZCands=sqrt( pow(HZ.Eta()-_MET.Eta(),2)+DPhi_pfMET_HZCands*DPhi_pfMET_HZCands );
   }
 
   inline void SetJets_Others(const UShort_t iJ1, const UShort_t iJ2) {
