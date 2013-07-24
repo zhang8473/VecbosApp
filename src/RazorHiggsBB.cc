@@ -19,8 +19,11 @@ using namespace std;
 #include "CommonTools/include/Utils.hh"
 #include "CommonTools/include/LeptonIdBits.h"
 #include "CommonTools/include/TriggerMask.hh"
+#include "CommonTools/include/LumiReWeightingStandAlone.h"
 #include "RazorHiggsBB.hh"
 
+#define pileup_mc "2012S10MCPileUp.root"
+#define pileup_data "pileup_190456-208686_8TeV_22Jan2013ReReco_Collisions12.root"
 #define aJETPT 20.//another jet pT cut
 #define JETPT 30.//jet pT cut
 #define JETETA 2.5
@@ -35,7 +38,6 @@ using namespace std;
 #define EleSelection electronPassWP95
 #define MET2CUT 80*80
 #define NUM_TREES 6
-
 //#define MYDEBUG
 
 RazorHiggsBB::RazorHiggsBB(TTree *tree) : Vecbos(tree) {
@@ -76,7 +78,9 @@ bool SortHZMass(const TLorentzVector &hz1, const TLorentzVector &hz2) {
 
 void RazorHiggsBB::Loop(string outFileName, Long64_t start, Long64_t stop) {
   if(fChain == 0) return;
+  reweight::LumiReWeighting LumiWeights( string(pileup_mc),string(pileup_data),"pileup","pileup" );
 
+  Double_t weight=1.;
   /*  // prescaled RazorHiggsBB Triggers
   int HLT_R014_MR150;
   int HLT_R020_MR150;
@@ -85,7 +89,7 @@ void RazorHiggsBB::Loop(string outFileName, Long64_t start, Long64_t stop) {
 
   // hadronic razor triggers
   Bool_t HLT_R020_MR550,HLT_R025_MR450,HLT_R033_MR350,HLT_R038_MR250;
-
+  
   //MET
   Double_t pfMET,DPhi_pfMET_trkMET,DPhi_pfMET_Jet;
 
@@ -130,7 +134,7 @@ void RazorHiggsBB::Loop(string outFileName, Long64_t start, Long64_t stop) {
       MakeBranch("nPU", nPU[1], "I");
     }
 
-    MakeBranch("W", _weight, "D");
+    MakeBranch("W", weight, "D");
     MakeBranch("nPV", nPV, "I");
 
     //number of other jets Jets.size()-2
@@ -217,13 +221,14 @@ void RazorHiggsBB::Loop(string outFileName, Long64_t start, Long64_t stop) {
 
   Long64_t nbytes = 0;
   Long64_t nb = 0;
+  Double_t sampleweight=1.;
   if (_isData) {
+    weight=1.;
     cout << "Number of entries = " << stop <<endl;
-    _weight=1.;
   }
   else {
-    cout << "Number of entries = " << stop << "; xsec="<<_weight<< "; weight="<<_weight/Double_t(stop)<<endl;
-    _weight=_weight/Double_t(stop);
+    sampleweight=_weight/Double_t(stop);
+    cout << "Number of entries = " << stop << "; xsec="<<_weight<< "; weight="<<sampleweight<<endl;
   }
   printf("Dummy");
   for (Long64_t jentry=start;  jentry<stop;jentry++) {//start event loop
@@ -294,7 +299,9 @@ void RazorHiggsBB::Loop(string outFileName, Long64_t start, Long64_t stop) {
       if ( MuonSelection(i) ) NMuon++;
     Nal=NEle+NMuon;
     if (Nal>0) continue;
-    
+
+    if (!_isData) weight=sampleweight*LumiWeights.weight(nPU[1]);
+
     pfMET=_MET.Mag();
     pfMETphi=_MET.Phi();
     TVector3 trkMET(pxTCMet[0], pyTCMet[0], 0.);//Track-Corrected MET
@@ -488,7 +495,6 @@ pair<TLorentzVector,TLorentzVector> RazorHiggsBB::CombineJets(const vector< pair
     }
   }
 
-  if(CombinedJets.second.Pt() > CombinedJets.first.Pt()) swap(CombinedJets.first,CombinedJets.second);
 #ifdef MYDEBUG
   cerr<<endl;
 #endif

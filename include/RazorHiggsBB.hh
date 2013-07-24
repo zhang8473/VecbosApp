@@ -69,7 +69,7 @@ private:
   bool _isData;
   bool _goodRunLS;
   TTree* _treeCond;
-  double _weight;
+  Double_t _weight;
 
   // HZ variables
   struct HZCand {
@@ -85,8 +85,9 @@ private:
   Double_t DEta_Jet1_Jet2,DR_Jet1_Jet2;//the topological info of the HZ candidate two daughters
   Double_t ptHZ,etaHZ,phiHZ,masssqHZ;//the HZ candidate
   Double_t DPhi_pfMET_HZCands,DR_pfMET_HZCands;//the topological info of the inv HZ and the visible ZH
-  inline void SetRazor(const TLorentzVector J1, const TLorentzVector J2) {
+  inline void SetRazor(TLorentzVector J1, TLorentzVector J2) {
     // the two jets
+    if (J1.Pt() < J2.Pt() ) swap(J1,J2);
     Jet1.pT=J1.Pt();
     Jet1.eta=J1.Eta();
     Jet1.phi=J1.Phi();
