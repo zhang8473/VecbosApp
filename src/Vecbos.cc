@@ -2931,12 +2931,13 @@ bool Vecbos::isLooseElectron(int iEle){
   return false;
 }
 
+/*
 double Vecbos::ILV(int iPFCand){
   double pfIso03 = NeutralIso03PFCand[iPFCand] + PhotonIso03PFCand[iPFCand] - 0.5*SumPUPtR03PFCand[iPFCand];
   double PT = pzPFCand[iPFCand]/sinh(etaPFCand[iPFCand]);
   return ( ChargedIso03PFCand[iPFCand] + max(pfIso03, 0.0) )/PT;
 }
-
+*/
 
 double Vecbos::CorrrectIsoforMuons(double pt) {
   if(pt <= 0.) return 0.0;

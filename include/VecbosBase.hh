@@ -769,7 +769,7 @@ public :
    Float_t         thehpsTancTausDiscrByLooseIsolationPFTau[200];   //[nPFTau]
    Float_t         thehpsTancTausDiscrByMediumIsolationPFTau[200];   //[nPFTau]
    Float_t         thehpsTancTausDiscrByTightIsolationPFTau[200];   //[nPFTau]
-   Int_t           nPFCand;
+  /*   Int_t           nPFCand;
    Int_t           chargePFCand[20];   //[nPFCand]
    Float_t         energyPFCand[20];   //[nPFCand]
    Float_t         thetaPFCand[20];   //[nPFCand]
@@ -785,7 +785,7 @@ public :
    Double_t        ChargedIso03PFCand[20];   //[nPFCand]
    Double_t        NeutralIso03PFCand[20];   //[nPFCand]
    Double_t        PhotonIso03PFCand[20];   //[nPFCand]
-   Double_t        SumPUPtR03PFCand[20];   //[nPFCand]
+   Double_t        SumPUPtR03PFCand[20];   //[nPFCand]*/
    Int_t           nReducedPFCand;
    Int_t           chargeReducedPFCand[50];   //[nReducedPFCand]
    Float_t         energyReducedPFCand[50];   //[nReducedPFCand]
@@ -1807,7 +1807,7 @@ public :
    TBranch        *b_thehpsTancTausDiscrByLooseIsolationPFTau;   //!
    TBranch        *b_thehpsTancTausDiscrByMediumIsolationPFTau;   //!
    TBranch        *b_thehpsTancTausDiscrByTightIsolationPFTau;   //!
-   TBranch        *b_nPFCand;   //!
+  /*   TBranch        *b_nPFCand;   //!
    TBranch        *b_chargePFCand;   //!
    TBranch        *b_energyPFCand;   //!
    TBranch        *b_thetaPFCand;   //!
@@ -1823,7 +1823,7 @@ public :
    TBranch        *b_ChargedIso03PFCand;   //!
    TBranch        *b_NeutralIso03PFCand;   //!
    TBranch        *b_PhotonIso03PFCand;   //!
-   TBranch        *b_SumPUPtR03PFCand;   //!
+   TBranch        *b_SumPUPtR03PFCand;   //!*/
    TBranch        *b_nReducedPFCand;   //!
    TBranch        *b_chargeReducedPFCand;   //!
    TBranch        *b_energyReducedPFCand;   //!
@@ -2917,7 +2917,7 @@ void VecbosBase::Init(TTree *tree)
    fChain->SetBranchAddress("thehpsTancTausDiscrByLooseIsolationPFTau", thehpsTancTausDiscrByLooseIsolationPFTau, &b_thehpsTancTausDiscrByLooseIsolationPFTau);
    fChain->SetBranchAddress("thehpsTancTausDiscrByMediumIsolationPFTau", thehpsTancTausDiscrByMediumIsolationPFTau, &b_thehpsTancTausDiscrByMediumIsolationPFTau);
    fChain->SetBranchAddress("thehpsTancTausDiscrByTightIsolationPFTau", thehpsTancTausDiscrByTightIsolationPFTau, &b_thehpsTancTausDiscrByTightIsolationPFTau);
-   fChain->SetBranchAddress("nPFCand", &nPFCand, &b_nPFCand);
+   /*   fChain->SetBranchAddress("nPFCand", &nPFCand, &b_nPFCand);
    fChain->SetBranchAddress("chargePFCand", chargePFCand, &b_chargePFCand);
    fChain->SetBranchAddress("energyPFCand", energyPFCand, &b_energyPFCand);
    fChain->SetBranchAddress("thetaPFCand", thetaPFCand, &b_thetaPFCand);
@@ -2933,7 +2933,7 @@ void VecbosBase::Init(TTree *tree)
    fChain->SetBranchAddress("ChargedIso03PFCand", ChargedIso03PFCand, &b_ChargedIso03PFCand);
    fChain->SetBranchAddress("NeutralIso03PFCand", NeutralIso03PFCand, &b_NeutralIso03PFCand);
    fChain->SetBranchAddress("PhotonIso03PFCand", PhotonIso03PFCand, &b_PhotonIso03PFCand);
-   fChain->SetBranchAddress("SumPUPtR03PFCand", SumPUPtR03PFCand, &b_SumPUPtR03PFCand);
+   fChain->SetBranchAddress("SumPUPtR03PFCand", SumPUPtR03PFCand, &b_SumPUPtR03PFCand);*/
    fChain->SetBranchAddress("nReducedPFCand", &nReducedPFCand, &b_nReducedPFCand);
    fChain->SetBranchAddress("chargeReducedPFCand", chargeReducedPFCand, &b_chargeReducedPFCand);
    fChain->SetBranchAddress("energyReducedPFCand", energyReducedPFCand, &b_energyReducedPFCand);
