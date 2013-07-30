@@ -38,6 +38,17 @@ using namespace std;
 #define EleSelection electronPassWP95
 #define MET2CUT 80*80
 #define NUM_TREES 6
+
+const char *triggernames[]={"HLT_HT",
+			    "HLT_RsqMR",
+			    "HLT_PFNoPUHT",
+			    "HLT_HT250_AlphaT0p55_v",
+			    "HLT_PFNoPUHT350_PFMET100_v",
+			    "HLT_RsqMR40_Rsq0p04_v",
+			    "HLT_RsqMR55_Rsq0p09_MR150_v",
+			    "HLT_RsqMR60_Rsq0p09_MR150_v",
+			    "HLT_RsqMR65_Rsq0p09_MR150_v"};
+const UChar_t Ntriggers=9;
 //#define MYDEBUG
 
 RazorHiggsBB::RazorHiggsBB(TTree *tree) : Vecbos(tree) {
@@ -80,15 +91,10 @@ void RazorHiggsBB::Loop(string outFileName, Long64_t start, Long64_t stop) {
   if(fChain == 0) return;
   reweight::LumiReWeighting LumiWeights( string(pileup_mc),string(pileup_data),"pileup","pileup" );
 
-  /*  // prescaled RazorHiggsBB Triggers
-  int HLT_R014_MR150;
-  int HLT_R020_MR150;
-  int HLT_R025_MR150;
-  */
   //event weight
   Double_t Evt_Weight=1.;
   // hadronic razor triggers
-  Bool_t HLT_R020_MR550,HLT_R025_MR450,HLT_R033_MR350,HLT_R038_MR250;
+  Bool_t HasPassedHLT[Ntriggers+1];
   
   //MET
   Double_t pfMET,DPhi_pfMET_trkMET,DPhi_pfMET_Jet;
@@ -115,13 +121,12 @@ void RazorHiggsBB::Loop(string outFileName, Long64_t start, Long64_t stop) {
 #define MakeBranch(Name,Var,Type) sprintf(BranchTitle,"%s/%s",Name,Type); \
   outTree[i]->Branch(Name, &Var,BranchTitle);
 
-  for(int i=0; i<NUM_TREES; i++) {
+  for (UChar_t i=0; i<NUM_TREES; i++) {
     //event based selection
-
-    MakeBranch("HLT_R020_MR550", HLT_R020_MR550, "O");
-    MakeBranch("HLT_R025_MR450", HLT_R025_MR450, "O");
-    MakeBranch("HLT_R033_MR350", HLT_R033_MR350, "O");
-    MakeBranch("HLT_R038_MR250", HLT_R038_MR250, "O");
+    for (UChar_t j=0; j<Ntriggers;j++) {
+      MakeBranch(triggernames[j], HasPassedHLT[j], "O");
+    }
+    MakeBranch("HLT_All_OR", HasPassedHLT[Ntriggers], "O");
     
     if (_isData) {
       MakeBranch("run", runNumber, "I");
@@ -215,10 +220,11 @@ void RazorHiggsBB::Loop(string outFileName, Long64_t start, Long64_t stop) {
   unsigned int lastRun=0;
 
   // hadronic razor triggers
-  std::vector<std::string> maskHLT_R020_MR550; maskHLT_R020_MR550.push_back("HLT_R020_MR550_v");
-  std::vector<std::string> maskHLT_R025_MR450; maskHLT_R025_MR450.push_back("HLT_R025_MR450_v");
-  std::vector<std::string> maskHLT_R033_MR350; maskHLT_R033_MR350.push_back("HLT_R033_MR350_v");
-  std::vector<std::string> maskHLT_R038_MR250; maskHLT_R038_MR250.push_back("HLT_R038_MR250_v");
+  std::vector<std::string> TriggerRequirements[Ntriggers+1];
+  for (UChar_t i=0;i<Ntriggers;i++) {
+    TriggerRequirements[i].push_back(std::string(triggernames[i]));
+    TriggerRequirements[Ntriggers].push_back(std::string(triggernames[i]));
+  }
 
   Long64_t nbytes = 0;
   Long64_t nb = 0;
@@ -232,6 +238,8 @@ void RazorHiggsBB::Loop(string outFileName, Long64_t start, Long64_t stop) {
     cout << "Number of entries = " << stop << "; xsec="<<_weight<< "; weight="<<sampleweight<<endl;
   }
   printf("Dummy");
+  Long64_t runNumber_prev_evt = 0;
+  vector<int> requiredtriggerbits[Ntriggers+1];
   for (Long64_t jentry=start;  jentry<stop;jentry++) {//start event loop
     Long64_t ientry = LoadTree(jentry);
     if (ientry < 0) break;
@@ -239,16 +247,16 @@ void RazorHiggsBB::Loop(string outFileName, Long64_t start, Long64_t stop) {
     if (jentry%100 == 0||jentry>stop-20) printf("\r>>> Processing event # %ld/%ld",jentry+1,stop);
 
     //IMPORTANT: FOR DATA RELOAD THE TRIGGER MASK PER FILE WHICH IS SUPPOSED TO CONTAIN UNIFORM CONDITIONS X FILE
-    if(_isData) {
-      
-      // hadronic razor triggers
-      setRequiredTriggers(maskHLT_R020_MR550); reloadTriggerMask(true); HLT_R020_MR550 = hasPassedHLT();
-      setRequiredTriggers(maskHLT_R025_MR450); reloadTriggerMask(true); HLT_R025_MR450 = hasPassedHLT();
-      setRequiredTriggers(maskHLT_R033_MR350); reloadTriggerMask(true); HLT_R033_MR350 = hasPassedHLT();
-      setRequiredTriggers(maskHLT_R038_MR250); reloadTriggerMask(true); HLT_R038_MR250 = hasPassedHLT();
-      
+    // hadronic razor triggers
+    for (UChar_t i=0;i<Ntriggers+1;i++) {
+      setRequiredTriggers(TriggerRequirements[i]);
+      if ( (_isData&&runNumber!=runNumber_prev_evt)||jentry==start ) {
+	//	cout<<"run "<<runNumber<<", reloading TriggerMask"<<endl;
+	requiredtriggerbits[i]=reloadTriggerMask(true);
+      }
+      HasPassedHLT[i] = hasPassedHLT(requiredtriggerbits[i]);
     }
-
+   
     //Good Run selection
     if (_isData && _goodRunLS && !isGoodRunLS()) {
       if ( lastRun != runNumber || lastLumi != lumiBlock) {
@@ -445,6 +453,7 @@ void RazorHiggsBB::Loop(string outFileName, Long64_t start, Long64_t stop) {
 	outTree[5]->Fill();
 	OrderInEvent++;
       }
+    runNumber_prev_evt=runNumber;
   }//end the event loop
   printf("\nOutput to %s\n",outFileName.c_str());
   for(int i=0; i<NUM_TREES; i++) 

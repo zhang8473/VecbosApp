@@ -114,7 +114,7 @@ std::string Vecbos::getHLTPathForRun(int runN, std::string fullname) {
   TString fullName = TString(fullname.c_str());
   TObjArray* selectionTokens = fullName.Tokenize(":");
   if (selectionTokens->GetEntries()!=2) {
-    std::cout << "Wrong trigger strings " << selectionTokens->GetEntries() << std::endl;
+    std::cout << "Wrong trigger strings " << fullName << std::endl;
     return std::string("NOPATH");
   }
   TString RunRange =((TObjString*)(*selectionTokens)[0])->GetString();
@@ -137,11 +137,15 @@ std::string Vecbos::getHLTPathForRun(int runN, std::string fullname) {
 }
 
 
-bool Vecbos::reloadTriggerMask(bool newVersion)
+vector<int> Vecbos::reloadTriggerMask(bool newVersion)
 {
   //  std::cout << "[ReloadTriggerMask]::Reloading trigger mask" << std::endl;
   if(newVersion) {
     std::vector<int> triggerMask;
+    std::cout << "===============";
+    for (std::vector< std::string >::const_iterator fIter=requiredTriggers.begin();fIter!=requiredTriggers.end();++fIter)
+      std::cout << *fIter << "=";
+    std::cout << "==============" << std::endl;
     for (std::vector< std::string >::const_iterator fIter=requiredTriggers.begin();fIter!=requiredTriggers.end();++fIter)
       {   
         for(unsigned int i=0; i<nameHLT->size(); i++)
@@ -151,12 +155,12 @@ bool Vecbos::reloadTriggerMask(bool newVersion)
 	    if( nameHLT->at(i).find(*fIter) != string::npos)
               {
                 triggerMask.push_back( indexHLT[i] ) ;
-		//std::cout << "[ReloadTriggerMaskNew]::Requiring bit " << indexHLT[i]  << " " << nameHLT->at(i).c_str() << std::endl;
-                break;
+		std::cout << "[ReloadTriggerMaskNew]::Requiring bit " << indexHLT[i]  << " " << nameHLT->at(i).c_str() << std::endl;
               }
           }
       }
     m_requiredTriggers = triggerMask;
+    return triggerMask;
     //std::cout << m_requiredTriggers.size() <<" " << std::endl;
   } else {
     TString fileName=((TChain*)fChain)->GetFile()->GetName();
@@ -196,6 +200,7 @@ bool Vecbos::reloadTriggerMask(bool newVersion)
         m_requiredTriggers = triggerMask;
         for (int i=0;i<m_requiredTriggers.size();++i)
           std::cout << "[ReloadTriggerMask]::Requiring bit " << m_requiredTriggers[i] << " " << requiredTriggers[i] << std::endl;
+	return triggerMask;
       }
   }
 }
@@ -2049,10 +2054,11 @@ void Vecbos::setRequiredTriggers(const std::vector<std::string>& reqTriggers) {
   requiredTriggers=reqTriggers;
 }
 
-bool Vecbos::hasPassedHLT() {
+bool Vecbos::hasPassedHLT(const vector<int> triggers) {
   Utils anaUtils;
   //std::cout << m_requiredTriggers.size() <<" " << std::endl;
-  return anaUtils.getTriggersOR(m_requiredTriggers, firedTrg);
+  if (triggers.empty()) return anaUtils.getTriggersOR(m_requiredTriggers, firedTrg);
+  else return anaUtils.getTriggersOR(triggers, firedTrg);
 }
 
 bool Vecbos::triggerMatch(float eta, float phi, float Dr){

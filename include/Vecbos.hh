@@ -107,14 +107,14 @@ public:
   /// check if Run/LS is a good one
   bool isGoodRunLS();
   /// reload TriggerMask if necessary (data file is changed). Should be called for each event inside the event loop
-  bool reloadTriggerMask(bool newVersion=false);
+  vector<int> reloadTriggerMask(bool newVersion=false);
   bool reloadTriggerMask(int runN);
   /// Gives the right trigger for the desired run range
   std::string getHLTPathForRun(int runN, std::string fullname);
   /// set the list of required trigger to produce the bitmask
   void setRequiredTriggers(const std::vector<std::string>& reqTriggers);
   //check if the event passed HLT. To be called per event
-  bool hasPassedHLT();
+  bool hasPassedHLT(const vector<int> triggers=vector<int>() );
   //check for matching HLT object
   bool triggerMatch(float eta, float phi, float Dr);
   //get the value of the requested bits
@@ -138,6 +138,7 @@ private:
 
 protected:
 
+  std::vector<int> m_requiredTriggers;
   // compute M_R
   double CalcMR(TLorentzVector ja, TLorentzVector jb);
   // compute MR*
@@ -152,8 +153,7 @@ protected:
   vector<TLorentzVector> CombineJets(vector<TLorentzVector> myjets);
 
   //! the list of required triggers
-  std::vector<int> m_requiredTriggers;
-  
+ 
   bool AlpgenIdSelection(double alpgenid, string sample); ///< Filter events according to the ALPGEN ID
 
   bool verbose; ///< Verbosity of printouts.
