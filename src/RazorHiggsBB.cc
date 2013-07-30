@@ -414,7 +414,6 @@ void RazorHiggsBB::Loop(string outFileName, Long64_t start, Long64_t stop) {
     
     //fill Branch 4: 2BJetsHZ
     //RENEWALL;
-    OrderInEvent=0;
     for ( UChar_t i=0;i<Jets.size()-1;i++ )
       if ( BTAG_Discriminator[Jets[i].second]>FIRSTCSVCUT )
 	for ( UChar_t j=i+1;j<Jets.size();j++ )
