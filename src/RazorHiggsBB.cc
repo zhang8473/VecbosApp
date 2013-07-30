@@ -140,7 +140,7 @@ void RazorHiggsBB::Loop(string outFileName, Long64_t start, Long64_t stop) {
 
     //number of other jets Jets.size()-2
     MakeBranch("Naj", Naj, "b");
-    MakeBranch("Nal", Nal, "b");
+    //    MakeBranch("Nal", Nal, "b");
 
     //pfMET
     MakeBranch("pfMET", pfMET, "D");
