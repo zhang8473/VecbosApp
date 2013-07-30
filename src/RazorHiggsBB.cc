@@ -80,13 +80,13 @@ void RazorHiggsBB::Loop(string outFileName, Long64_t start, Long64_t stop) {
   if(fChain == 0) return;
   reweight::LumiReWeighting LumiWeights( string(pileup_mc),string(pileup_data),"pileup","pileup" );
 
-  Double_t weight=1.;
   /*  // prescaled RazorHiggsBB Triggers
   int HLT_R014_MR150;
   int HLT_R020_MR150;
   int HLT_R025_MR150;
   */
-
+  //event weight
+  Double_t Evt_Weight=1.;
   // hadronic razor triggers
   Bool_t HLT_R020_MR550,HLT_R025_MR450,HLT_R033_MR350,HLT_R038_MR250;
   
@@ -102,6 +102,7 @@ void RazorHiggsBB::Loop(string outFileName, Long64_t start, Long64_t stop) {
 
   // prepare the output tree
   TTree* outTree[NUM_TREES];
+  TFile *file = new TFile(outFileName.c_str(),"RECREATE");
   //TBranch* treeBranches[100];  UChar_t NBranches=0;
   char BranchTitle[100];
   outTree[0] = new TTree("CombinedJetsRazor", "CombinedJetsRazor");
@@ -134,7 +135,7 @@ void RazorHiggsBB::Loop(string outFileName, Long64_t start, Long64_t stop) {
       MakeBranch("nPU", nPU[1], "I");
     }
 
-    MakeBranch("W", weight, "D");
+    MakeBranch("W", Evt_Weight, "D");
     MakeBranch("nPV", nPV, "I");
 
     //number of other jets Jets.size()-2
@@ -207,7 +208,7 @@ void RazorHiggsBB::Loop(string outFileName, Long64_t start, Long64_t stop) {
     MakeBranch("OrderInEvent", OrderInEvent, "b");
   }
 
-#define RENEWALL Jet1.pT=-9999.;Jet1.eta=-9999;Jet1.phi=-9999;Jet1.masssq=-9999;Jet1.BTAG=-9999;Jet1.pileupMVA=-9999;Jet1.area=-9999;Jet1.pull=-9999;Jet2.pT=-9999.;Jet2.eta=-9999;Jet2.phi=-9999;Jet2.masssq=-9999;Jet2.BTAG=-9999;Jet2.pileupMVA=-9999;Jet2.area=-9999;Jet2.pull=-9999;MAXBTAGAJet=-9999;DEta_Jet1_Jet2=-9999;DR_Jet1_Jet2=-9999;MRsq=-9999;RBeta=-9999;MRStarsq=-9999;MTRsq=-9999;RStarBetaL=-9999;RStarBetaT=-9999;ptHZ=-9999;etaHZ=-9999;phiHZ=-9999;masssqHZ=-9999;DPhi_pfMET_HZCands=-9999;DR_pfMET_HZCands=-9999;BTAGHZ=-9999;jetareaHZ=-9999;jetpileupMVAHZ=-9999;OrderInEvent=255
+#define RENEWALL Jet1.pT=-9999.;Jet1.eta=-9999;Jet1.phi=-9999;Jet1.masssq=-9999;Jet1.BTAG=-9999;Jet1.pileupMVA=-9999;Jet1.area=-9999;Jet1.pull=-9999;Jet2.pT=-9999.;Jet2.eta=-9999;Jet2.phi=-9999;Jet2.masssq=-9999;Jet2.BTAG=-9999;Jet2.pileupMVA=-9999;Jet2.area=-9999;Jet2.pull=-9999;MAXBTAGAJet=-9999;DEta_Jet1_Jet2=-9999;DR_Jet1_Jet2=-9999;MRsq=-9999;RBeta=-9999;MRStarsq=-9999;MTRsq=-9999;RStarsq=-9999;RStarBetaL=-9999;RStarBetaT=-9999;ptHZ=-9999;etaHZ=-9999;phiHZ=-9999;masssqHZ=-9999;DPhi_pfMET_HZCands=-9999;DR_pfMET_HZCands=-9999;OrderInEvent=255
 
   //  Double_t _weight = 1.;
   unsigned int lastLumi=0;
@@ -223,7 +224,7 @@ void RazorHiggsBB::Loop(string outFileName, Long64_t start, Long64_t stop) {
   Long64_t nb = 0;
   Double_t sampleweight=1.;
   if (_isData) {
-    weight=1.;
+    Evt_Weight=1.;
     cout << "Number of entries = " << stop <<endl;
   }
   else {
@@ -300,7 +301,7 @@ void RazorHiggsBB::Loop(string outFileName, Long64_t start, Long64_t stop) {
     Nal=NEle+NMuon;
     if (Nal>0) continue;
 
-    if (!_isData) weight=sampleweight*LumiWeights.weight(nPU[1]);
+    if (!_isData) Evt_Weight=sampleweight*LumiWeights.weight(nPU[1]);
 
     pfMET=_MET.Mag();
     pfMETphi=_MET.Phi();
@@ -354,6 +355,7 @@ void RazorHiggsBB::Loop(string outFileName, Long64_t start, Long64_t stop) {
 
     //fill Branch 0: CombinedJetsRazor
     //RENEWALL;
+    OrderInEvent=0;
     pair<TLorentzVector,TLorentzVector> CombinedJets = CombineJets(Jets,true);
     SetRazor(CombinedJets.first,CombinedJets.second);
     Naj=N_totaljets-Jets.size();
@@ -445,7 +447,6 @@ void RazorHiggsBB::Loop(string outFileName, Long64_t start, Long64_t stop) {
       }
   }//end the event loop
   printf("\nOutput to %s\n",outFileName.c_str());
-  TFile *file = new TFile(outFileName.c_str(),"RECREATE");
   for(int i=0; i<NUM_TREES; i++) 
     outTree[i]->Write();
   file->Close();
