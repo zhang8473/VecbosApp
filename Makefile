@@ -75,9 +75,7 @@ GenVecbosApp: $(SRCDIR)GenVecbosApp.C \
 
 VecbosApp:  $(SRCDIR)VecbosApp.C \
 	$(OUTLIB)Vecbos.o \
-	$(OUTLIB)DiJet.o \
         $(OUTLIB)RazorHiggsBB.o \
-	$(OUTLIB)MonoJet.o \
 	$(OUTLIB)CandleCalib.o \
 	$(OUTLIBCOMMON)Conditions.o \
 	$(OUTLIBCOMMON)Selection.o \
@@ -97,14 +95,15 @@ VecbosApp:  $(SRCDIR)VecbosApp.C \
 	$(OUTLIB)RedVecbosVertexTree.o \
 	$(OUTLIB)RedIsolationVtxOptimTree.o \
 	$(OUTLIB)RedEleIDOptimTree.o \
-	$(OUTLIB)VBTFLeptEff.o \
 	$(OUTLIB)SUSYNLO.o 	
 	$(CXX) $(CXXFLAGS) -o VecbosApp $(OUTLIB)/*.o $(OUTLIBCOMMON)/*o $(OUTLIBEGAMMA)/*o $(GLIBS) $ $<
 # fix for 2012 data format
-#	$(OUTLIB)RazorDiPhoton.o \
-#	$(OUTLIB)RazorBoostedTop.o \
-#	$(OUTLIB)SUSYMultiB.o \
-#	$(OUTLIB)CreateWJetDataset.o \
+#	$(OUTLIB)VBTFLeptEff.o \
+	$(OUTLIB)MonoJet.o \
+	$(OUTLIB)RazorDiPhoton.o \
+	$(OUTLIB)RazorBoostedTop.o \
+	$(OUTLIB)SUSYMultiB.o \
+	$(OUTLIB)CreateWJetDataset.o \
 
 FindDuplicatedApp:  $(SRCDIR)FindDuplicatedApp.C \
 	$(OUTLIB)FindDuplicatedEvents.o 
@@ -136,24 +135,24 @@ lib: 	$(OUTLIBCOMMON)Conditions.o \
 	$(OUTLIB)RedEleIDOptimTree.o \
 	$(OUTLIB)VecbosTTCounter.o \
 	$(OUTLIB)TestAnalysis.o \
-	$(OUTLIB)DiJet.o \
 	$(OUTLIB)RazorHiggsBB.o \
-#	$(OUTLIB)RazorMultiB.o \
+#	$(OUTLIB)DiJet.o \
+	$(OUTLIB)RazorMultiB.o \
 	$(OUTLIB)MonoJet.o \
 	$(OUTLIB)CandleCalib.o \
 	$(OUTLIB)VBTFLeptEff.o \
-	$(OUTLIB)SUSYNLO.o
-#	$(OUTLIB)VecbosMuMuSelection.o \
-#	$(OUTLIB)LFJetControlSample.o \
-#	$(OUTLIB)CandleCalib_ee.o 
-#	$(OUTLIB)EventShapeAnalysis.o \
-#	$(OUTLIB)VtxStudy.o \
-#	$(OUTLIB)GenJetAnalysis.o \
-#	$(OUTLIB)RSAnalysis.o \
-#	$(OUTLIB)RSZZAnalysis.o \
-#	$(OUTLIB)SUSYAnalysis.o \
-#	$(OUTLIB)ThiagoAnalysis.o \
-#	$(OUTLIB)VecbosAnalysis.o   \
+	$(OUTLIB)SUSYNLO.o \
+	$(OUTLIB)VecbosMuMuSelection.o \
+	$(OUTLIB)LFJetControlSample.o \
+	$(OUTLIB)CandleCalib_ee.o \
+	$(OUTLIB)EventShapeAnalysis.o \
+	$(OUTLIB)VtxStudy.o \
+	$(OUTLIB)GenJetAnalysis.o \
+	$(OUTLIB)RSAnalysis.o \
+	$(OUTLIB)RSZZAnalysis.o \
+	$(OUTLIB)SUSYAnalysis.o \
+	$(OUTLIB)ThiagoAnalysis.o \
+	$(OUTLIB)VecbosAnalysis.o   \
 # fix for 2012 data format
 #	$(OUTLIB)RazorDiPhoton.o \
 #	$(OUTLIB)RazorBoostedTop.o \
@@ -185,8 +184,8 @@ $(OUTLIB)GammaPlusJet.o: $(SRCDIR)GammaPlusJet.cc $(OUTLIB)Vecbos.o
 $(OUTLIB)CandleCalib_ee.o: $(SRCDIR)CandleCalib_ee.cc $(OUTLIB)Vecbos.o
 	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)CandleCalib_ee.o $<
 
-$(OUTLIB)DiJet.o: $(SRCDIR)DiJet.cc $(OUTLIB)Vecbos.o
-	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)DiJet.o $<
+#$(OUTLIB)DiJet.o: $(SRCDIR)DiJet.cc $(OUTLIB)Vecbos.o
+#	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)DiJet.o $<
 
 $(OUTLIB)RazorHiggsBB.o: $(SRCDIR)RazorHiggsBB.cc $(OUTLIB)Vecbos.o $(OUTLIB)SUSYNLO.o
 	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)RazorHiggsBB.o $<
@@ -194,8 +193,8 @@ $(OUTLIB)RazorHiggsBB.o: $(SRCDIR)RazorHiggsBB.cc $(OUTLIB)Vecbos.o $(OUTLIB)SUS
 #$(OUTLIB)RazorMultiB.o: $(SRCDIR)RazorMultiB.cc $(OUTLIB)Vecbos.o
 #	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)RazorMultiB.o $<
 
-$(OUTLIB)MonoJet.o: $(SRCDIR)MonoJet.cc $(OUTLIB)Vecbos.o
-	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)MonoJet.o $<
+#$(OUTLIB)MonoJet.o: $(SRCDIR)MonoJet.cc $(OUTLIB)Vecbos.o
+#	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)MonoJet.o $<
 
 $(OUTLIB)SF_Filler.o: $(SRCDIR)SF_Filler.cc $(OUTLIB)Vecbos.o
 	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)SF_Filler.o $<
@@ -267,8 +266,8 @@ $(OUTLIB)CreateWJetDataset.o: $(SRCDIR)CreateWJetDataset.cc $(OUTLIB)VecbosBase.
 $(OUTLIB)SUSYNLO.o: $(SRCDIR)SUSYNLO.cc 
 	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)SUSYNLO.o $<
 
-$(OUTLIB)VBTFLeptEff.o: $(SRCDIR)VBTFLeptEff.cc
-	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)VBTFLeptEff.o $<
+#$(OUTLIB)VBTFLeptEff.o: $(SRCDIR)VBTFLeptEff.cc
+#	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)VBTFLeptEff.o $<
 
 #$(OUTLIB)VecbosMuMuSelection.o: $(SRCDIR)VecbosMuMuSelection.cc $(OUTLIB)Vecbos.o \
 #	$(OUTLIB)JetCounter.o $(OUTLIB)McTruthEvent.o $(OUTLIB)CutBasedSelectorEE.o
