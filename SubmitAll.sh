@@ -1,12 +1,18 @@
 #!/bin/bash
+#######################################################
+# VecbosApp submitter based on Samples.csv            #
+# Author: Zhang Jinzhong, zhangjin@cern.ch            #
+#######################################################
+#usage ./SubmitAll.sh [local,test]
 j=0
 while read line
 do
     (( j+=1 ))
     declare -a arr=($(echo $line | tr "," " "))
-    List[$j]=`echo ${arr[0]}`
+    List[$j]=${arr[0]}
     XSec[$j]=${arr[1]}
-    echo $j":"${List[$j]}"----"${XSec[$j]}
+    NEvt[$j]=${arr[2]}
+    echo "$j:${List[$j]} ---- ${XSec[$j]} / ${NEvt[$j]}"
 done < "Samples.csv"
 #Choice
 until [ `expr match "$Choice" '[:blank: \.0-9]*'` = "${#Choice}" ]&&[[ "$Choice" == [0-9]* ]]
@@ -29,26 +35,42 @@ done
 
 for j in $Choice
 do
-    outputname=${List[$j]#${List[$j]%/*}}
-    outputname=/afs/cern.ch/work/z/zhangjin${outputname%.list}
-    echo "#!/bin/bash">$outputname.sh
-    echo "cd $CMSSW_BASE/src/">>$outputname.sh
-    echo "eval \`scramv1 runtime -sh\`">>$outputname.sh
-    echo "cd VecbosApp">>$outputname.sh
-    if [ `expr match "${XSec[$j]}" ".*JSON.*"` != "0" ]; then
-        echo "./VecbosApp ${List[$j]} $outputname.root --isData -json=${XSec[$j]}">>$outputname.sh		
-    else
-    	echo "./VecbosApp ${List[$j]} $outputname.root -weight=${XSec[$j]}">>$outputname.sh
-    fi
-    echo "rm $outputname.sh">>$outputname.sh
-    chmod +x $outputname.sh
-    echo $j":"${List[$j]}"----"${XSec[$j]}" ===>"
-    case $1 in
-	local)
+    nsplitfiles=`eval echo ${List[$j]/"."/"_*."}|wc|awk '{print $2}'`
+    for i in $(seq 1 1 $nsplitfiles)
+    do
+	if [ $nsplitfiles -gt 1 ]; then
+	    inputname=${List[$j]/"."/"_$i."}
+	else
+	    inputname=${List[$j]}
+	fi
+	outputname=${inputname#${inputname%/*}}
+	outputname=/afs/cern.ch/work/z/zhangjin${outputname%.list}
+	echo "#!/bin/bash">$outputname.sh
+	echo "cd $CMSSW_BASE/src/">>$outputname.sh
+	echo "eval \`scramv1 runtime -sh\`">>$outputname.sh
+	echo "cd VecbosApp">>$outputname.sh
+	if [ `expr match "${XSec[$j]}" ".*JSON.*"` != "0" ]; then
+            echo "./VecbosApp $inputname $outputname.root --isData -json=${XSec[$j]}">>$outputname.sh
+	    echo "$j:$inputname --- X:${XSec[$j]} ===>"
+	else
+	    if [ $nsplitfiles -gt 1 ]; then
+		NEvent=`bc<<< "scale=1;${NEvt[$j]}"`
+    		echo "./VecbosApp $inputname $outputname.root -xsec=${XSec[$j]} -nevt=$NEvent">>$outputname.sh
+		echo "$j:$inputname ---X:${XSec[$j]} ---N:$NEvent ---njobs:$nsplitfiles ===>"
+	    else
+    		echo "./VecbosApp $inputname $outputname.root -xsec=${XSec[$j]}">>$outputname.sh
+		echo "$j:$inputname ---X:${XSec[$j]} ===>"
+	    fi
+	fi
+	echo "rm $outputname.sh">>$outputname.sh
+	chmod +x $outputname.sh
+	case $1 in
+	    local)
 		nohup $outputname.sh>$outputname.out&;;
-        test)
+            test)
 		;;
-	"")
+	    "")
     		bsub -q 1nw $outputname.sh;;
-    esac
+	esac
+    done
 done
