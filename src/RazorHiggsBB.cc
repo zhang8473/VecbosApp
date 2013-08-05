@@ -138,9 +138,9 @@ void RazorHiggsBB::Loop(string outFileName, Long64_t start, Long64_t stop) {
     else {
       MakeBranch("evNum", eventNumber, "l");
       MakeBranch("nPU", nPU[1], "I");
+      MakeBranch("W", Evt_Weight, "D");
     }
 
-    MakeBranch("W", Evt_Weight, "D");
     MakeBranch("nPV", nPV, "I");
 
     //number of other jets Jets.size()-2
@@ -228,15 +228,9 @@ void RazorHiggsBB::Loop(string outFileName, Long64_t start, Long64_t stop) {
 
   Long64_t nbytes = 0;
   Long64_t nb = 0;
-  Double_t sampleweight=1.;
-  if (_isData) {
-    Evt_Weight=1.;
-    cout << "Number of entries = " << stop <<endl;
-  }
-  else {
-    sampleweight=_weight/Double_t(stop);
-    cout << "Number of entries = " << stop << "; xsec="<<_weight<< "; weight="<<sampleweight<<endl;
-  }
+  if (_isData) cout << "Number of entries = " << stop <<endl;
+  else cout << "Number of entries = " << stop << "; weight="<<_weight<<endl;
+
   printf("Dummy");
   Long64_t runNumber_prev_evt = 0;
   vector<int> requiredtriggerbits[Ntriggers+1];
@@ -309,7 +303,7 @@ void RazorHiggsBB::Loop(string outFileName, Long64_t start, Long64_t stop) {
     Nal=NEle+NMuon;
     if (Nal>0) continue;
 
-    if (!_isData) Evt_Weight=sampleweight*LumiWeights.weight(nPU[1]);
+    if (!_isData) Evt_Weight=_weight*LumiWeights.weight(nPU[1]);
 
     pfMET=_MET.Mag();
     pfMETphi=_MET.Phi();
