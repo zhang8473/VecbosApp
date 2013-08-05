@@ -202,13 +202,14 @@ int main(int argc, char* argv[]) {
   Long64_t stop  = theChain->GetEntries();
   bool isData = false;
   float lumi = -999.;
-  float xsec = -999.;
-  float weight = 1.;
+  float xsec = -999.,weight=1.;
+  Long64_t nevt = 0;
   for (int i=1;i<argc;i++){
     if (strncmp(argv[i],"-start",6)==0) sscanf(argv[i],"-start=%ld",&start);
     if (strncmp(argv[i],"-stop",5)==0)  sscanf(argv[i],"-stop=%ld",&stop);
     if (strncmp(argv[i],"-signal",7)==0)  sscanf(argv[i],"-signal=%i",&signal);
     if (strncmp(argv[i],"-weight",7)==0)  sscanf(argv[i],"-weight=%f",&weight);
+    if (strncmp(argv[i],"-nevt",5)==0)  sscanf(argv[i],"-nevt=%ld",&nevt);
     if (strncmp(argv[i],"--isData",8)==0)  isData = true;
     if (strncmp(argv[i],"-lumi",5)==0)  sscanf(argv[i],"-lumi=%f",&lumi);
     if (strncmp(argv[i],"-xsec",5)==0)  sscanf(argv[i],"-xsec=%f",&xsec);
@@ -636,11 +637,10 @@ int main(int argc, char* argv[]) {
 #if Application == 24
   if(isData) {
     RazorHiggsBB vecbos(theChain, string(json), true, true);
-    vecbos.SetWeight(double(weight));
     vecbos.Loop(string(outFileName), start, stop);
   } else {
     RazorHiggsBB vecbos(theChain, string(json), false, false);
-    vecbos.SetWeight(double(weight));
+    vecbos.SetWeight( nevt>0?xsec/Double_t(nevt):xsec/Double_t(stop-start) );
     vecbos.Loop(string(outFileName), start, stop);
   }
 #endif
