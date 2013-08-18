@@ -1,31 +1,37 @@
-$CMSSW_BASE/src/VecbosApp/VecbosSamples/53X/V00_5_3_X/MC/TTJetsFullyLeptMGDecaysTauola.list,13.43,12000000
-$CMSSW_BASE/src/VecbosApp/VecbosSamples/53X/V00_5_3_X/MC/TTJetsSemiLeptMGDecaysTauola.list,53.2,24953451
-$CMSSW_BASE/src/VecbosApp/VecbosSamples/53X/V00_5_3_X/MC/TTJetsHadMGDecays.list,53.4,31223821*591/632
-$CMSSW_BASE/src/VecbosApp/VecbosSamples/53X/V00_5_3_X/MC/ZJetsToNuNu_50_HT_100.list,381.2,4000000
-$CMSSW_BASE/src/VecbosApp/VecbosSamples/53X/V00_5_3_X/MC/ZJetsToNuNu_100_HT_200.list,160.3,4000000
-$CMSSW_BASE/src/VecbosApp/VecbosSamples/53X/V00_5_3_X/MC/ZJetsToNuNu_200_HT_400.list,41.49,4000000
-$CMSSW_BASE/src/VecbosApp/VecbosSamples/53X/V00_5_3_X/MC/ZJetsToNuNu_400_HT_inf.list,5.274,1100000
-$CMSSW_BASE/src/VecbosApp/VecbosSamples/53X/V00_5_3_X/MC/WJetsToLNu_150_HT_200.list,235.6,21686209
-$CMSSW_BASE/src/VecbosApp/VecbosSamples/53X/V00_5_3_X/MC/WJetsToLNu_200_HT_250.list,90.27,10039771*201/202
-$CMSSW_BASE/src/VecbosApp/VecbosSamples/53X/V00_5_3_X/MC/WJetsToLNu_250_HT_300.list,48.01,4940990*100/101
-$CMSSW_BASE/src/VecbosApp/VecbosSamples/53X/V00_5_3_X/MC/WJetsToLNu_300_HT_400.list,38.3,5141023*101/104
-$CMSSW_BASE/src/VecbosApp/VecbosSamples/53X/V00_5_3_X/MC/WJetsToLNu_400_HT_Inf.list,25.22,4971847*100/101
-$CMSSW_BASE/src/VecbosApp/VecbosSamples/53X/V00_5_3_X/MC/WW_TuneZ2star_8TeV_pythia6_tauola.list,33.61,500000
-$CMSSW_BASE/src/VecbosApp/VecbosSamples/53X/V00_5_3_X/MC/WZ_TuneZ2star_8TeV_pythia6_tauola.list,12.63,10000000
-$CMSSW_BASE/src/VecbosApp/VecbosSamples/53X/V00_5_3_X/MC/ZZ_TuneZ2star_8TeV_pythia6_tauola.list,5.196,10000000
-$CMSSW_BASE/src/VecbosApp/VecbosSamples/53X/V00_5_3_X/MC/T_t-channel_TuneZ2star_8TeV-powheg-tauola.list,47.0,100000
-$CMSSW_BASE/src/VecbosApp/VecbosSamples/53X/V00_5_3_X/MC/T_s-channel_TuneZ2star_8TeV-powheg-tauola.list,2.82,260000
-$CMSSW_BASE/src/VecbosApp/VecbosSamples/53X/V00_5_3_X/MC/T_tW-channel-DR_TuneZ2star_8TeV-powheg-tauola.list,10.7,825000
-$CMSSW_BASE/src/VecbosApp/VecbosSamples/53X/V00_5_3_X/MC/Tbar_t-channel_TuneZ2star_8TeV-powheg-tauola.list,25.0,2000000
-$CMSSW_BASE/src/VecbosApp/VecbosSamples/53X/V00_5_3_X/MC/Tbar_s-channel_TuneZ2star_8TeV-powheg-tauola.list,1.57,140000
-$CMSSW_BASE/src/VecbosApp/VecbosSamples/53X/V00_5_3_X/MC/Tbar_tW-channel-DR_TuneZ2star_8TeV-powheg-tauola.list,10.7,825000
-$CMSSW_BASE/src/VecbosApp/VecbosSamples/53X/V00_5_3_X/MC/ZH_ZToBB_HToInv_M-150_8TeV.list,0.02176,500000
-$CMSSW_BASE/src/VecbosApp/VecbosSamples/53X/V00_5_3_X/MC/ZH_ZToBB_HToInv_M-145_8TeV.list,0.02427,500000
-$CMSSW_BASE/src/VecbosApp/VecbosSamples/53X/V00_5_3_X/MC/ZH_ZToBB_HToInv_M-135_8TeV.list,0.03161,500000
-$CMSSW_BASE/src/VecbosApp/VecbosSamples/53X/V00_5_3_X/MC/ZH_ZToBB_HToInv_M-125_8TeV.list,0.04177,500000
-$CMSSW_BASE/src/VecbosApp/VecbosSamples/53X/V00_5_3_X/MC/ZH_ZToBB_HToInv_M-115_8TeV.list,0.05557,500000
-$CMSSW_BASE/src/VecbosApp/VecbosSamples/53X/V00_5_3_X/MC/ZH_ZToBB_HToInv_M-105_8TeV.list,0.07435,500000
-$CMSSW_BASE/src/VecbosApp/VecbosSamples/53X/V00_5_3_X/Data/HTMHT_Run2012A_ILV.list,/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions12/8TeV/Reprocessing/Cert_190456-208686_8TeV_22Jan2013ReReco_Collisions12_JSON.txt,190782,190949,1.0
+$CMSSW_BASE/src/VecbosApp/VecbosSamples/53X/V00_5_3_X/MC/TTJetsFullyLeptMGDecaysTauola.list,13.43*(245.8/136.3),12000000,NNLO
+$CMSSW_BASE/src/VecbosApp/VecbosSamples/53X/V00_5_3_X/MC/TTJetsSemiLeptMGDecaysTauola.list,53.2*(245.8/136.3),24953451,NNLO
+$CMSSW_BASE/src/VecbosApp/VecbosSamples/53X/V00_5_3_X/MC/TTJetsHadMGDecays.list,53.4*(245.8/136.3),31223821*591/632,NNLO
+$CMSSW_BASE/src/VecbosApp/VecbosSamples/53X/V00_5_3_X/MC/ZJetsToNuNu_50_HT_100.list,381.2*1.6,4000000,NLO
+$CMSSW_BASE/src/VecbosApp/VecbosSamples/53X/V00_5_3_X/MC/ZJetsToNuNu_100_HT_200.list,160.3*1.6,4000000,NLO
+$CMSSW_BASE/src/VecbosApp/VecbosSamples/53X/V00_5_3_X/MC/ZJetsToNuNu_200_HT_400.list,41.49*1.6,4000000,NLO
+$CMSSW_BASE/src/VecbosApp/VecbosSamples/53X/V00_5_3_X/MC/ZJetsToNuNu_400_HT_inf.list,5.274*1.6,1100000,NLO
+$CMSSW_BASE/src/VecbosApp/VecbosSamples/53X/V00_5_3_X/MC/WJetsToLNu_150_HT_200.list,235.6*(37509/30400.),21686209,NNLO
+$CMSSW_BASE/src/VecbosApp/VecbosSamples/53X/V00_5_3_X/MC/WJetsToLNu_200_HT_250.list,90.27*(37509/30400.),10039771*201/202,NNLO
+$CMSSW_BASE/src/VecbosApp/VecbosSamples/53X/V00_5_3_X/MC/WJetsToLNu_250_HT_300.list,48.01*(37509/30400.),4940990*100/101,NNLO
+$CMSSW_BASE/src/VecbosApp/VecbosSamples/53X/V00_5_3_X/MC/WJetsToLNu_300_HT_400.list,38.3*(37509/30400.),5141023*101/104,NNLO
+$CMSSW_BASE/src/VecbosApp/VecbosSamples/53X/V00_5_3_X/MC/WJetsToLNu_400_HT_Inf.list,25.22*(37509/30400.),4971847*100/101,NNLO
+$CMSSW_BASE/src/VecbosApp/VecbosSamples/53X/V00_5_3_X/MC/WW_TuneZ2star_8TeV_pythia6_tauola.list,54.838,500000,NLO
+$CMSSW_BASE/src/VecbosApp/VecbosSamples/53X/V00_5_3_X/MC/WZ_TuneZ2star_8TeV_pythia6_tauola.list,33.21,10000000,NLO m(ll)>12
+$CMSSW_BASE/src/VecbosApp/VecbosSamples/53X/V00_5_3_X/MC/ZZ_TuneZ2star_8TeV_pythia6_tauola.list,8.059,10000000,NLO m(ll)>40
+$CMSSW_BASE/src/VecbosApp/VecbosSamples/53X/V00_5_3_X/MC/T_t-channel_TuneZ2star_8TeV-powheg-tauola.list,56.4,100000,NNLO
+$CMSSW_BASE/src/VecbosApp/VecbosSamples/53X/V00_5_3_X/MC/T_s-channel_TuneZ2star_8TeV-powheg-tauola.list,3.79,260000,NNLO
+$CMSSW_BASE/src/VecbosApp/VecbosSamples/53X/V00_5_3_X/MC/T_tW-channel-DR_TuneZ2star_8TeV-powheg-tauola.list,11.1,825000,NNLO
+$CMSSW_BASE/src/VecbosApp/VecbosSamples/53X/V00_5_3_X/MC/Tbar_t-channel_TuneZ2star_8TeV-powheg-tauola.list,30.7,2000000,NNLO
+$CMSSW_BASE/src/VecbosApp/VecbosSamples/53X/V00_5_3_X/MC/Tbar_s-channel_TuneZ2star_8TeV-powheg-tauola.list,1.76,140000,NNLO
+$CMSSW_BASE/src/VecbosApp/VecbosSamples/53X/V00_5_3_X/MC/Tbar_tW-channel-DR_TuneZ2star_8TeV-powheg-tauola.list,11.1,825000,NNLO
+$CMSSW_BASE/src/VecbosApp/VecbosSamples/53X/V00_5_3_X/MC/ZH_ZToBB_HToInv_M-150_8TeV.list,0.2308*0.1512,500000,NNLO QCD+NLO EW
+$CMSSW_BASE/src/VecbosApp/VecbosSamples/53X/V00_5_3_X/MC/ZH_ZToBB_HToInv_M-145_8TeV.list,0.2583*0.1512,500000,NNLO QCD+NLO EW
+$CMSSW_BASE/src/VecbosApp/VecbosSamples/53X/V00_5_3_X/MC/ZH_ZToBB_HToInv_M-135_8TeV.list,0.3259*0.1512,500000,NNLO QCD+NLO EW
+$CMSSW_BASE/src/VecbosApp/VecbosSamples/53X/V00_5_3_X/MC/ZH_ZToBB_HToInv_M-125_8TeV.list,0.4153*0.1512,500000,NNLO QCD+NLO EW
+$CMSSW_BASE/src/VecbosApp/VecbosSamples/53X/V00_5_3_X/MC/ZH_ZToBB_HToInv_M-115_8TeV.list,0.5358*0.1512,500000,NNLO QCD+NLO EW
+$CMSSW_BASE/src/VecbosApp/VecbosSamples/53X/V00_5_3_X/MC/ZH_ZToBB_HToInv_M-105_8TeV.list,0.7022*0.1512,500000,NNLO QCD+NLO EW
+$CMSSW_BASE/src/VecbosApp/VecbosSamples/53X/V09-5_3_X/MC/ZH_ZToNuNu_HToBB_M-110_8TeV.list,0.6125*0.745*0.2,1000320,NNLO QCD+NLO EW
+$CMSSW_BASE/src/VecbosApp/VecbosSamples/53X/V09-5_3_X/MC/ZH_ZToNuNu_HToBB_M-125_8TeV.list,0.4153*0.577*0.2,1000000,NNLO QCD+NLO EW
+$CMSSW_BASE/src/VecbosApp/VecbosSamples/53X/V09-5_3_X/MC/ZH_ZToNuNu_HToBB_M-140_8TeV.list,0.2898*0.315*0.2,999413,NNLO QCD+NLO EW
+$CMSSW_BASE/src/VecbosApp/VecbosSamples/53X/V09-5_3_X/Data/MET__Run2012A22Jan2013rereco_190456-193621.list,/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions12/8TeV/Reprocessing/Cert_190456-208686_8TeV_22Jan2013ReReco_Collisions12_JSON.txt,1.0
+$CMSSW_BASE/src/VecbosApp/VecbosSamples/53X/V09-5_3_X/Data/MET__Run2012B22Jan2013rereco_193834-196531.list,/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions12/8TeV/Reprocessing/Cert_190456-208686_8TeV_22Jan2013ReReco_Collisions12_JSON.txt,1.0
+$CMSSW_BASE/src/VecbosApp/VecbosSamples/53X/V09-5_3_X/Data/MET__Run2012C22Jan2013rereco_198022-203742.list,/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions12/8TeV/Reprocessing/Cert_190456-208686_8TeV_22Jan2013ReReco_Collisions12_JSON.txt,1.0
+$CMSSW_BASE/src/VecbosApp/VecbosSamples/53X/V00_5_3_X/Data/HTMHT_Run2012A_ILV.list,/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions12/8TeV/Reprocessing/Cert_190456-208686_8TeV_22Jan2013ReReco_Collisions12_JSON.txt,190782,190949,1.0(%finished)
 $CMSSW_BASE/src/VecbosApp/VecbosSamples/53X/V00_5_3_X/Data/HTMHT_Run2012B_ILV.list,/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions12/8TeV/Reprocessing/Cert_190456-208686_8TeV_22Jan2013ReReco_Collisions12_JSON.txt,193834,196531,1.0
 $CMSSW_BASE/src/VecbosApp/VecbosSamples/53X/V00_5_3_X/Data/HTMHT__Run2012C24Aug2012v1.list,/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions12/8TeV/Prompt/Cert_190456-208686_8TeV_PromptReco_Collisions12_JSON.txt,197770,198913,1.0
 $CMSSW_BASE/src/VecbosApp/VecbosSamples/53X/V00_5_3_X/Data/HTMHT__Run2012CPromptRecov2.list,/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions12/8TeV/Prompt/Cert_190456-208686_8TeV_PromptReco_Collisions12_JSON.txt,198934,200601,???

@@ -11,6 +11,9 @@ do
     declare -a arr=($(echo $line | tr "," " "))
     List[$j]=${arr[0]}
     XSec[$j]=${arr[1]}
+    if [ `expr match "${XSec[$j]}" "[0-9./*()]*"` == ${#XSec[$j]} ]; then
+	XSec[$j]=`bc<<< "scale=1;${XSec[$j]}"`
+    fi
     NEvt[$j]=${arr[2]}
     echo "$j:${List[$j]} ---- ${XSec[$j]} / ${NEvt[$j]}"
 done < "Samples.csv"
@@ -36,6 +39,7 @@ done
 for j in $Choice
 do
     nsplitfiles=`eval echo ${List[$j]/"."/"_*."}|wc|awk '{print $2}'`
+#    nsplitfiles=1
     for i in $(seq 1 1 $nsplitfiles)
     do
 	if [ $nsplitfiles -gt 1 ]; then
@@ -70,7 +74,7 @@ do
             test)
 		;;
 	    "")
-    		bsub -q 1nw $outputname.sh;;
+    		bsub -q 2nd $outputname.sh;;
 	esac
     done
 done
