@@ -30,6 +30,8 @@ public:
   void SetWeight(double weight);
   void Loop(string outFileName, Long64_t start, Long64_t stop);
   void SetConditions(TTree* treeCond);
+  Bool_t TauSelection(UShort_t itau);
+  Bool_t MuonSelection(UShort_t iMuon);
 
   inline Double_t CalcMRsq(TLorentzVector ja, TLorentzVector jb){
     Double_t a0 = ja.P(), b0 = jb.P(),

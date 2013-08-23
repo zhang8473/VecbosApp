@@ -26,29 +26,47 @@ using namespace std;
 #define pileup_data "pileup_190456-208686_8TeV_22Jan2013ReReco_Collisions12.root"
 #define aJETPT 20.//another jet pT cut
 #define JETPT 30.//jet pT cut
+#define FIRSTJETPT 60.//first jet pT cut (only do jobs in 2BJetsHZ TTree)
 #define JETETA 2.5
-#define HZ_MassMin 70.
 #define CSVL 0.244
-//#define CSVM 0.679
-#define CSVM 0.5
+#define CSVM 0.679
 #define CSVT 0.898
+
+/*Final Select Region
+#define HZ_MassMin 60.
+#define HZ_MassMax 120.
 #define FIRSTCSVCUT CSVT
 #define SECONDCSVCUT 0.5
-#define MuonSelection muonPassTight
-#define EleSelection electronPassWP95
-#define MET2CUT 80*80
+#define EleSelection electronPassWP80
+#define MET2CUT 100*100
+#define MAXNLeptons 1
+*/
+
+//Including Control Region
+#define HZ_MassMin 0.
+#define HZ_MassMax 250.
+#define FIRSTCSVCUT CSVL
+#define SECONDCSVCUT 0
+#define EleSelection electronPassWP80
+#define MET2CUT 100*100
+#define MAXNLeptons 1
+
 #define NUM_TREES 6
+
 
 const char *triggernames[]={"HLT_HT",
 			    "HLT_RsqMR",
 			    "HLT_PFNoPUHT",
+			    "HLT_DiCentralJetSumpT100_dPhi05_DiCentralPFJet60_25_PFMET100_HBHENoiseCleaned_v",
+			    "HLT_DiCentralPFJet30_PFMET80_BTagCSV07_v",
+			    "HLT_PFMET150_v",
 			    "HLT_HT250_AlphaT0p55_v",
 			    "HLT_PFNoPUHT350_PFMET100_v",
-			    "HLT_RsqMR40_Rsq0p04_v",
+			    //"HLT_RsqMR40_Rsq0p04_v", prescaled trigger, do not use
 			    "HLT_RsqMR55_Rsq0p09_MR150_v",
 			    "HLT_RsqMR60_Rsq0p09_MR150_v",
 			    "HLT_RsqMR65_Rsq0p09_MR150_v"};
-const UChar_t Ntriggers=9;
+const UChar_t Ntriggers=11;
 //#define MYDEBUG
 
 RazorHiggsBB::RazorHiggsBB(TTree *tree) : Vecbos(tree) {
@@ -67,6 +85,37 @@ RazorHiggsBB::RazorHiggsBB(TTree *tree, string json, bool goodRunLS, bool isData
     setJsonGoodRunList(json);
     fillRunLSMap();
   }
+}
+
+Bool_t RazorHiggsBB::TauSelection(UShort_t itau) {
+  return (isNonNullPFTau[itau]
+	  &&abs(chargePFTau[itau])==1
+	  &&thehpsTauDiscrByDecayModeFindingPFTau[itau]>0.5
+	  &&pxPFTau[itau]*pxPFTau[itau]+pyPFTau[itau]*pyPFTau[itau]>1600
+	  &&fabs(etaPFTau[itau])<2.1
+	  &&theTauDiscrByLeadingTrackPtCutPFTau[itau]>0.5 //the pt cut is at 5Gev/c, discri has only 1 or 0
+	  &&thehpsTauDiscrByTightMuonRejectionPFTau[itau]>0.5
+	  &&thehpsTauDiscrByLooseElectronRejectionPFTau[itau]>0.5
+	  &&thehpsTauDiscrByLooseCombinedIsolationDBSumPtCorrPFTau[itau]>0.5
+	  )?true:false;//difference with AN-13-069: leading pt cut at 20GeV, one-prong only
+}
+
+Bool_t RazorHiggsBB::MuonSelection(UShort_t imu) {
+  Utils AnalysisUtilities;
+  int iTrack = trackIndexMuon[imu];
+  Double_t PT = sqrt(pxMuon[imu] * pxMuon[imu] + pyMuon[imu] * pyMuon[imu]);
+  return (AnalysisUtilities.muonIdVal(muonIdMuon[imu], bits::AllGlobalMuons)
+	  &&AnalysisUtilities.muonIdVal(muonIdMuon[imu], bits::AllTrackerMuons)//AN-13-069(new): PFMuon
+	  &&trackNormalizedChi2GlobalMuonTrack[iTrack]<10
+	  &&numberOfValidPixelBarrelHitsTrack[iTrack]+numberOfValidPixelEndcapHitsTrack[iTrack]>0
+	  &&numberOfValidStripTIBHitsTrack[iTrack]+numberOfValidStripTIDHitsTrack[iTrack]+numberOfValidStripTOBHitsTrack[iTrack]+numberOfValidStripTECHitsTrack[iTrack]>=6
+	  &&numberOfValidMuonHitsGlobalMuonTrack[iTrack]>=1
+	  &&numberOfMatchesMuon[imu]>=2
+	  &&fabs(transvImpactParTrack[iTrack])<0.2
+	  &&pfCandChargedIso04Muon[imu]+pfCandNeutralIso04Muon[imu]+pfCandPhotonIso04Muon[imu]<PT*0.12
+	  &&fabs(etaMuon[imu])<2.4
+	  &&PT>20
+	  )?true:false;
 }
 
 void RazorHiggsBB::SetConditions(TTree* treeCond) {
@@ -100,7 +149,7 @@ void RazorHiggsBB::Loop(string outFileName, Long64_t start, Long64_t stop) {
   Double_t pfMET,DPhi_pfMET_trkMET,DPhi_pfMET_Jet;
 
   // general event info
-  UChar_t Naj,Nal,N_totaljets,OrderInEvent;// number of other jets and leptons
+  UChar_t Naj,NEle,NMuon,NTau,N_totaljets,OrderInEvent;// number of other jets and leptons
 
   Double_t MAXBTAGAJet;// the max CVS of other jets
   //Double_t ColorPullAngleHZCands;
@@ -145,13 +194,16 @@ void RazorHiggsBB::Loop(string outFileName, Long64_t start, Long64_t stop) {
 
     //number of other jets Jets.size()-2
     MakeBranch("Naj", Naj, "b");
-    //    MakeBranch("Nal", Nal, "b");
+    MakeBranch("NEle", NEle, "b");
+    MakeBranch("NMuon", NMuon, "b");
+    MakeBranch("NTau", NTau, "b");
 
     //pfMET
     MakeBranch("pfMET", pfMET, "D");
+    MakeBranch("pfMETsig", mEtSigMet[0], "D");
     MakeBranch("pfMETphi", pfMETphi, "D");
     MakeBranch("DPhi_pfMET_trkMET", DPhi_pfMET_trkMET, "D");//azimuthal opening angle between the direction of ET measured with particle flow objects vs. charged particles (tkMET). This variable helps in reducing residual QCD background in the Z(νν)H channel arising from events where there is a mismatch in the missing energy measured by the calorime-ters vs. the tracker. It also has the advantage of being indepedent of ∆φ(pfMET, J).
-    MakeBranch("DPhi_pfMET_Jet", DPhi_pfMET_Jet, "D");//azimuthal opening angle between the pfMET vector direction and the transverse momentum of the closest central jet in azimuth. Only jets satisfying pT > 30 GeV and |η | < 2.5 are considered. This variable helps in reducing residual QCD background in the Z(νν)H channel, where the source of the missing transverse energy is typically from fluctuations in the measured energy of a single jet.
+    MakeBranch("DPhi_pfMET_Jet", DPhi_pfMET_Jet, "D");//azimuthal opening angle between the pfMET vector direction and the transverse momentum of the closest central jet in azimuth. Only jets satisfying pT > 30 GeV and |η| < 2.5 are considered. This variable helps in reducing residual QCD background in the Z(νν)H channel, where the source of the missing transverse energy is typically from fluctuations in the measured energy of a single jet.
 
 
     if (i<5) {
@@ -294,18 +346,20 @@ void RazorHiggsBB::Loop(string outFileName, Long64_t start, Long64_t stop) {
     _MET=TVector3(pxPFMet[0], pyPFMet[0], 0.);
     if ( _MET.Perp2()<MET2CUT ) continue;
     //lepton veto
-    UShort_t NEle=0;
+    NEle=0;NMuon=0;NTau=0;
     for(UShort_t i=0; i<nEle; i++)
       if ( EleSelection(i) ) NEle++;
-    UShort_t NMuon=0;
     for(UShort_t i=0; i<nMuon; i++)
       if ( MuonSelection(i) ) NMuon++;
-    Nal=NEle+NMuon;
-    if (Nal>0) continue;
+    for(UShort_t i=0; i<nPFTau; i++)
+      if ( TauSelection(i) ) NTau++;
+    //printf("NEle=%d;NMu=%d;NTau=%d\n",NEle,NMuon,NTau);
+    if (NEle+NMuon+NTau>MAXNLeptons) continue;
 
     if (!_isData) Evt_Weight=_weight*LumiWeights.weight(nPU[1]);
 
     pfMET=_MET.Mag();
+
     pfMETphi=_MET.Phi();
     TVector3 trkMET(pxTCMet[0], pyTCMet[0], 0.);//Track-Corrected MET
     DPhi_pfMET_trkMET=OpeningAngle(pfMETphi,trkMET.Phi());
@@ -411,9 +465,11 @@ void RazorHiggsBB::Loop(string outFileName, Long64_t start, Long64_t stop) {
     for ( UChar_t i=0;i<Jets.size()-1;i++ )
       if ( BTAG_Discriminator[Jets[i].second]>FIRSTCSVCUT )
 	for ( UChar_t j=i+1;j<Jets.size();j++ )
-	  if ( BTAG_Discriminator[Jets[i].second]>SECONDCSVCUT )  {
+	  if ( BTAG_Discriminator[Jets[j].second]>SECONDCSVCUT &&
+	       (Jets[i].first.Pt()>FIRSTJETPT||Jets[j].first.Pt()>FIRSTJETPT)
+	       )  {
 	    TLorentzVector HZ = Jets[i].first+Jets[j].first;
-	    if ( HZ.M()>HZ_MassMin ) {
+	    if ( HZ.M()>HZ_MassMin&&HZ.M()<HZ_MassMax ) {
 	      SetRazor(Jets[i].first,Jets[j].first);
 	      SetJets_Others(Jets[i].second,Jets[j].second);
 	      ptHZ=HZ.Pt();
@@ -432,7 +488,7 @@ void RazorHiggsBB::Loop(string outFileName, Long64_t start, Long64_t stop) {
     //RENEWALL;
     OrderInEvent=0;
     for ( UChar_t i=0;i<Jets.size();i++ ) 
-      if (Jets[i].first.M() > HZ_MassMin) {
+      if (Jets[i].first.M() > HZ_MassMin && Jets[i].first.M()<HZ_MassMax) {
 	ptHZ=Jets[i].first.Pt();
 	etaHZ=Jets[i].first.Eta();
 	phiHZ=Jets[i].first.Phi();
